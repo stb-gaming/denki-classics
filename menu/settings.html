@@ -1,13 +1,37 @@
-<form action="none" onsubmit="saveSettings">
-	<h2>Games Folders</h2>
+<h2>Games Folders</h2>
+<form id="yes">
 
-	<h2>Games</h2>
-
+	<input type="text" name="a" id="b">
+	<button type="submit">
 
 </form>
+
+<h2>Games</h2>
+
+
 <script>
+
+	/**
+	 * @param form {HTMLFormElement}
+	 */
+	function getFormData(form) {
+		return Array.from(form.querySelectorAll("input select")).reduce((obj, { name, value }) => {
+			obj[name] = value;
+			return obj;
+		}, {});
+	}
+
+	function setFormData(form, data) {
+		for (const child of Array.from(form.querySelectorAll("input select"))) {
+			child.value = data[child.name];
+		}
+	}
+
+	let form = document.getElementById("yes");
 	function loadSettings(settings) {
 		// put stuff bacvk into form
+		setFormData(form, settings);
+
 
 	}
 	SkyGames.loadSettings().then(loadSettings);
@@ -17,8 +41,10 @@
 	 * @param e {SubmitEvent}
 	 */
 	async function saveSettings(e) {
-		let settings = {};
+		e.preventDefault();
+
 		///TODO: get form fields
+		let setings = getFormData(e.target);
 
 		try {
 			await SkyGames.saveSettings(settings);
@@ -33,4 +59,6 @@
 
 		location.href = "index.html";
 	}
+
+	form.addEventListener("submit", saveSettings)
 </script>
