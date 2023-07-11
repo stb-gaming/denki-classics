@@ -1,0 +1,36 @@
+<form action="none" onsubmit="saveSettings">
+	<h2>Games Folders</h2>
+
+	<h2>Games</h2>
+
+
+</form>
+<script>
+	function loadSettings(settings) {
+		// put stuff bacvk into form
+
+	}
+	SkyGames.loadSettings().then(loadSettings);
+
+
+	/**
+	 * @param e {SubmitEvent}
+	 */
+	async function saveSettings(e) {
+		let settings = {};
+		///TODO: get form fields
+
+		try {
+			await SkyGames.saveSettings(settings);
+
+		} catch (error) {
+			if (error) {
+				alert("There was an error, see console, for more info");
+				console.error(error);
+				return;
+			}
+		}
+
+		location.href = "index.html";
+	}
+</script>
