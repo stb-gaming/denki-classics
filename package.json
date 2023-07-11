@@ -17,6 +17,8 @@
 	},
 	"homepage": "https://github.com/stb-gaming/denki-classics#readme",
 	"devDependencies": {
+		"cordova": "^12.0.0",
+		"cordova-android": "^12.0.0",
 		"electron": "^25.2.0",
 		"electron-builder": "^24.4.0"
 	},
@@ -28,5 +30,10 @@
 		"win": {
 			"icon": "assets/img/bee.ico"
 		}
+	},
+	"cordova": {
+		"platforms": [
+			"android"
+		]
 	}
 }
