@@ -1,11 +1,11 @@
 {
-	"name": "Denki Classics",
+	"name": "DenkiClassics",
 	"version": "0.0.1",
-	"description": "Desktop app for playing sky games",
+	"description": "Beehive Bedlam, just Beehive Bedlam",
 	"main": "index.js",
 	"scripts": {
-		"start": "electron .",
-		"buildWindows": "electron-builder build --win --x64 --ia32 --publish never",
+		"start": "electron src",
+		"buildWindows": "electron-builder build --win portable zip --x64 --ia32 --publish never",
 		"buildLinux": "electron-builder build --linux AppImage tar.gz --publish never",
 		"buildMac": "electron-builder build --mac pkg --publish never"
 	},
@@ -21,9 +21,12 @@
 		"electron-builder": "^24.4.0"
 	},
 	"build": {
-		"appId": "io.github.stb-gaming.deki-classics",
+		"appId": "io.github.stb-gaming.denki-classics",
 		"mac": {
 			"category": "your.app.category.type"
+		},
+		"win": {
+			"icon": "assets/img/bee.ico"
 		}
 	}
 }
