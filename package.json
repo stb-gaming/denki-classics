@@ -1,0 +1,29 @@
+{
+	"name": "sky-games-desktop",
+	"version": "0.0.1",
+	"description": "Desktop app for playing sky games",
+	"main": "index.js",
+	"scripts": {
+		"start": "electron .",
+		"buildWindows": "electron-builder build --win --x64 --ia32 --publish never",
+		"buildLinux": "electron-builder build --linux AppImage tar.gz --publish never",
+		"buildMac": "electron-builder build --mac pkg --publish never"
+	},
+	"repository": "git+https://github.com/stb-gaming/denki-classics.git",
+	"author": "tumble1999",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/stb-gaming/denki-classics/issues"
+	},
+	"homepage": "https://github.com/stb-gaming/denki-classics#readme",
+	"devDependencies": {
+		"electron": "^25.2.0",
+		"electron-builder": "^24.4.0"
+	},
+	"build": {
+		"appId": "io.github.stb-gaming.deki-classics",
+		"mac": {
+			"category": "your.app.category.type"
+		}
+	}
+}
