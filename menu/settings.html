@@ -20,6 +20,11 @@
 			return obj;
 		}, {});
 	}
+	function getFormDataAlt(form) {
+		return Array.from(new FormData(form).entries()).reduce((obj, [k, v]) => {
+			obj[k] = v;
+		}, {});
+	}
 
 	function setFormData(form, data) {
 		for (const child of Array.from(form.querySelectorAll("input select"))) {
