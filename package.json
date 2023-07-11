@@ -1,5 +1,5 @@
 {
-	"name": "Denki Classics",
+	"name": "denki-classics",
 	"version": "0.0.1",
 	"description": "Desktop app for playing sky games",
 	"main": "index.js",
