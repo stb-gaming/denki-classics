@@ -4,7 +4,7 @@
 	"description": "Beehive Bedlam, just Beehive Bedlam",
 	"main": "index.js",
 	"scripts": {
-		"start": "electron src",
+		"start": "electron .",
 		"watchSass": "sass --watch menu/scss:menu/css",
 		"buildSass": "sass menu/scss:menu/css",
 		"buildWindows": "electron-builder build --win portable zip --x64 --ia32 --publish never",
