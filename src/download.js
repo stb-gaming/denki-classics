@@ -3,14 +3,15 @@ const fs = require("fs/promises");
 
 const downloadFile = async (url, destPath) => {
     const filename = url.split("/").pop();
-    const res = await fetch(url);
-    const buf = Buffer.from(await res.arrayBuffer());
     const destination = path.join(destPath, filename)
 
     try {
         await fs.access(destination, fs.constants.R_OK)
-    } catch (err) {
-        fs.writeFile(destination, Buffer.from(buf), err => {
+        // file exists, do nothing
+    } catch (err) { // download file
+        const res = await fetch(url);
+        const buf = Buffer.from(await res.arrayBuffer());
+        fs.writeFile(destination, buf, err => {
             if (err) return console.error(err);
         })
     }
