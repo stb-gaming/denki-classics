@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
-const { downloadFile } = require("./download");
+const { downloadFile, downloadGame } = require("./download");
+const { fileReadable } = require("./utils");
 const path = require('path');
 const fs = require('fs/promises');
 
@@ -15,16 +16,45 @@ const createWindow = () => {
 
 	win.loadFile('../menu/index.html');
 
+	return win;
 };
+
+const getSettings = async () => {
+	const json = await fs.readFile(app.settingsPath);
+	return JSON.parse(json);
+}
 
 const ipcHandlers = {
 	'getFolder': () => app.userDataPath,
 	'savesettings': async (event, settings) => {
 		await fs.writeFile(app.settingsPath, JSON.stringify(settings, null, 2));
 	},
-	'loadsettings': async () => {
-		const json = await fs.readFile(app.settingsPath);
-		return JSON.parse(json);
+	'loadsettings': async () => await getSettings(),
+	'launchgame': async (event, id) => {
+		const settings = await getSettings();
+		const gamePath = settings.gamesFolder;
+		const gameFiles = ["app.html", "app.js", "app.wasm", "app.data"]
+
+		let gameInstalled = true;
+
+		for (const file of gameFiles) {
+			if (!fileReadable(path.join(gamePath, id, file))) {
+				gameInstalled = false;
+				break;
+			}
+		}
+
+		if (!gameInstalled) {
+			return false;
+		} else {
+			app.mainWindow.loadFile(path.join(gamePath, id, "app.html"))
+			return true;
+		}
+	},
+	'installgame': async (event, id) => {
+		const settings = await getSettings();
+		const gamePath = settings.gamesFolder;
+		await downloadGame(id, gamePath)
 	}
 };
 
@@ -44,5 +74,5 @@ app.whenReady().then(async () => {
 	Object.entries(ipcHandlers).forEach(([channel, func]) => {
 		ipcMain.handle(channel, func)
 	})
-	createWindow();
+	app.mainWindow = createWindow();
 });
