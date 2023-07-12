@@ -5,6 +5,8 @@
 	"main": "index.js",
 	"scripts": {
 		"start": "electron src",
+		"watchSass": "sass --watch menu/scss:menu/css",
+		"buildSass": "sass menu/scss:menu/css",
 		"buildWindows": "electron-builder build --win portable zip --x64 --ia32 --publish never",
 		"buildLinux": "electron-builder build --linux AppImage tar.gz --publish never",
 		"buildMac": "electron-builder build --mac pkg --publish never"
@@ -18,7 +20,8 @@
 	"homepage": "https://github.com/stb-gaming/denki-classics#readme",
 	"devDependencies": {
 		"electron": "^25.2.0",
-		"electron-builder": "^24.4.0"
+		"electron-builder": "^24.4.0",
+		"sass": "^1.63.6"
 	},
 	"build": {
 		"appId": "io.github.stb-gaming.denki-classics",

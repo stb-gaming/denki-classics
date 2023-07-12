@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="style.css">
+
 <h2>Settings</h2>
 <form id="settings" name="Settings">
 	<label for="games-folder">Games folder:</label>
@@ -15,7 +17,7 @@
 		let data = new FormData(form);
 		let obj = {};
 
-		data.forEach((value, key) => { obj[key] = value });
+		data.forEach((value, key) => { obj[key] = value; });
 		return obj;
 	}
 
@@ -26,7 +28,7 @@
 	}
 
 	let form = document.getElementById("settings");
-	
+
 	function loadSettings(settings) {
 		// put stuff into form
 		setFormData(form, settings);
