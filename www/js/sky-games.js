@@ -185,7 +185,7 @@ function pressBack() {
 
 
 function pressBlue() {
-	window.location = "../menu/settings.html";
+	window.location = "../www/settings.html";
 }
 
 function pressSelect() {
