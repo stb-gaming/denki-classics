@@ -3,6 +3,7 @@ const { downloadFile, downloadGame } = require("./download");
 const { fileReadable } = require("./utils");
 const path = require('path');
 const fs = require('fs/promises');
+const yaml = require('yaml')
 
 const createWindow = () => {
 	const win = new BrowserWindow({
@@ -58,6 +59,10 @@ const ipcHandlers = {
 		const settings = await getSettings();
 		const gamePath = settings.gamesFolder;
 		await downloadGame(id, gamePath);
+	},
+	'loadgames': async () => {
+		const yml = await fs.readFile(app.gamesYaml);
+		return yaml.parse(yml);
 	}
 };
 

@@ -31,5 +31,8 @@
 		"win": {
 			"icon": "assets/img/bee.ico"
 		}
+	},
+	"dependencies": {
+		"yaml": "^2.3.1"
 	}
 }
