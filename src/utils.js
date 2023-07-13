@@ -1,12 +1,12 @@
 const fs = require("fs/promises");
 
-const fileReadable = (filePath) => {
-    let isReadable;
-    fs.access(filePath, fs.constants.F_OK | fs.constants.R_OK)
-        .then(() => { isReadable = true; })
-        .catch(err => { isReadable = false; });
-    return isReadable;
-
+const fileReadable = async (filePath) => {
+    try {
+        await fs.access(filePath, fs.constants.F_OK | fs.constants.R_OK)
+        return true;
+    } catch(err) {
+        return false;
+    }
 }
 
 module.exports = { fileReadable }

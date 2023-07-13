@@ -28,11 +28,10 @@ app.whenReady().then(async () => {
 	app.settingsPath = path.join(app.userDataPath, "settings.json");
 	app.gamesYaml = path.join(app.userDataPath, "games.yml");
 
-	if (!fileReadable(app.settingsPath)) {
+	if (!await fileReadable(app.settingsPath)) {
 		await fs.writeFile(app.settingsPath, JSON.stringify(require("./defaults"), null, 2))
 	}
-
-	if (fileReadable(app.gamesYaml)) {
+	if (await fileReadable(app.gamesYaml)) {
 		console.log(`games.yml exists in ${app.userDataPath}: OK!`)
 	} else {
 		console.error(`games.yml doesn't exist yet - downloading to ${app.gamesYaml}`)

@@ -24,7 +24,7 @@ module.exports = {
 		let gameInstalled = true;
 
 		for (const file of gameFiles) {
-			if (!fileReadable(path.join(gamePath, id, file))) {
+			if (!await fileReadable(path.join(gamePath, id, file))) {
 				gameInstalled = false;
 				break;
 			}
