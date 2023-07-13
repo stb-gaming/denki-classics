@@ -6,5 +6,7 @@ contextBridge.exposeInMainWorld("SkyGames", {
 	loadSettings: () => ipcRenderer.invoke('loadsettings'),
 	installGame: (id) => ipcRenderer.invoke('installgame', id),
 	launchGame: (id) => ipcRenderer.invoke('launchgame', id),
-	loadGames: () => ipcRenderer.invoke('loadgames')
+	loadGames: () => ipcRenderer.invoke('loadgames'),
+	loadJs: () => ipcRenderer.invoke('loadjs'),
+	loadCss: () => ipcRenderer.invoke('loadcss')
 });

@@ -24,6 +24,7 @@ const createWindow = () => {
 	return win;
 };
 
+
 app.whenReady().then(async () => {
 	app.userDataPath = app.getPath("userData");
 	app.settingsPath = path.join(app.userDataPath, "settings.json");
@@ -38,6 +39,8 @@ app.whenReady().then(async () => {
 		console.error(`games.yml doesn't exist yet - downloading to ${app.gamesYaml}`);
 		await downloadFile("https://raw.githubusercontent.com/stb-gaming/sky-games/master/_data/games.yml", app.userDataPath);
 	}
+
+	//todo: download the files in assets.js into userdata/assets/{css,js,userscripts}
 
 	Object.entries(require("./handlers")).forEach(([channel, func]) => {
 		ipcMain.handle(channel, func);

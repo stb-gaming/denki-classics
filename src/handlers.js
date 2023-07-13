@@ -48,5 +48,13 @@ module.exports = {
 		//return yaml.parse(yml)
 		*/
 		return yml.load(app.gamesYaml);
+	},
+	'getcss': async () => {
+		//TODO: return an array of css paths from assets.js
+
+	},
+	'getjs': async () => {
+		//TODO: return an array of js paths from assets.js
+
 	}
 };
