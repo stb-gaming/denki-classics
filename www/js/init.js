@@ -55,7 +55,7 @@
 
 
 function pressBlue() {
-	window.location = "../menu/settings.html";
+	window.location = "../www/settings.html";
 }
 
 if (typeof SkyRemote != "undefined") {
