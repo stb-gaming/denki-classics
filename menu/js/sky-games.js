@@ -185,7 +185,7 @@ function pressBack() {
 
 
 function pressBlue() {
-	window.location = "/sky-games";
+	window.location = "../menu/settings.html";
 }
 
 function pressSelect() {
@@ -216,8 +216,6 @@ SkyRemote.createSkyRemote({
 });*/
 
 Array.from(document.getElementsByClassName("game")).forEach(g => {
-
-
 	g.addEventListener("click", e => {
 		e.preventDefault();
 
