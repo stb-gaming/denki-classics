@@ -68,13 +68,13 @@ header {
 		$width: 3.5em;
 		$pos: 1em;
 		&.right {
-			border-width: $height/2 0 $height/2 $width;
+			border-width: calc($height / 2) 0 calc($height / 2) $width;
 			border-color: transparent transparent transparent #f42f64;
 			right: $pos;
 		}
 
 		&.left {
-			border-width: $height/2 $width $height/2 0;
+			border-width: calc($height / 2) $width calc($height / 2) 0;
 			border-color: transparent #f42f64 transparent transparent;
 			left: $pos;
 		}
@@ -87,13 +87,13 @@ header {
 			top: 50%;
 			margin: auto;
 			&.right {
-				border-width: $height/2 0 $height/2 $width;
+				border-width: calc($height / 2) 0 calc($height / 2) $width;
 				border-color: transparent transparent transparent #f42f64;
 				right: $pos;
 			}
 
 			&.left {
-				border-width: $height/2 $width $height/2 0;
+				border-width: calc($height / 2) $width calc($height / 2) 0;
 				border-color: transparent #f42f64 transparent transparent;
 				left: $pos;
 			}
