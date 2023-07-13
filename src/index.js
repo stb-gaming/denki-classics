@@ -74,11 +74,10 @@ app.whenReady().then(async () => {
 	app.settingsPath = path.join(app.userDataPath, "settings.json");
 	app.gamesYaml = path.join(app.userDataPath, "games.yml");
 
-	try {
-		await fs.access(app.gamesYaml, fs.constants.R_OK);
-		console.log(`games.yml exists in ${app.userDataPath}: OK!`);
-	} catch (err) {
-		console.error(`games.yml doesn't exist in ${app.userDataPath}, downloading it now.`);
+	if (fileReadable(app.gamesYaml)) {
+		console.log(`games.yml exists in ${app.userDataPath}: OK!`)
+	} else {
+		console.error(`games.yml doesn't exist yet - downloading to ${app.gamesYaml}`)
 		await downloadFile("https://raw.githubusercontent.com/stb-gaming/sky-games/master/_data/games.yml", app.userDataPath);
 	}
 
