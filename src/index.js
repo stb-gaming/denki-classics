@@ -19,7 +19,7 @@ const createWindow = () => {
 	win.menuBarVisible = 0;
 	//win.maximize();
 
-	win.loadFile('menu/index.html');
+	win.loadFile('www/index.html');
 
 	return win;
 };
