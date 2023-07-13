@@ -79,7 +79,7 @@ app.whenReady().then(async () => {
 		console.log(`games.yml exists in ${app.userDataPath}: OK!`);
 	} catch (err) {
 		console.error(`games.yml doesn't exist in ${app.userDataPath}, downloading it now.`);
-		downloadFile("https://raw.githubusercontent.com/stb-gaming/sky-games/master/_data/games.yml", app.userDataPath);
+		await downloadFile("https://raw.githubusercontent.com/stb-gaming/sky-games/master/_data/games.yml", app.userDataPath);
 	}
 
 	Object.entries(ipcHandlers).forEach(([channel, func]) => {
