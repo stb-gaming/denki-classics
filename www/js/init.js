@@ -52,3 +52,12 @@
 		}
 
 })();
+
+
+function pressBlue() {
+	window.location = "../menu/settings.html";
+}
+
+if (typeof SkyRemote != "undefined") {
+	SkyRemote.onPressButton("blue", pressBlue);
+}
