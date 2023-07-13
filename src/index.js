@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const { downloadFile } = require("./download");
 const { fileReadable } = require("./utils");
 
+const fs = require("fs/promises");
 const path = require('path');
 
 const createWindow = () => {
@@ -26,6 +27,10 @@ app.whenReady().then(async () => {
 	app.userDataPath = app.getPath("userData");
 	app.settingsPath = path.join(app.userDataPath, "settings.json");
 	app.gamesYaml = path.join(app.userDataPath, "games.yml");
+
+	if (!fileReadable(app.settingsPath)) {
+		await fs.writeFile(app.settingsPath, JSON.stringify(require("./defaults"), null, 2))
+	}
 
 	if (fileReadable(app.gamesYaml)) {
 		console.log(`games.yml exists in ${app.userDataPath}: OK!`)
