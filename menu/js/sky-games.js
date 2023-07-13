@@ -13,6 +13,9 @@ let
 	allList = document.getElementById("all-games"),
 	sortOptions = document.getElementById("sort-options"),
 
+	menus;
+
+document.addEventListener("load", () => {
 	menus = [
 		createMenu({
 			pages: Array.from(document.getElementsByClassName("games-list")),
@@ -32,13 +35,15 @@ let
 			columns: 3
 		})
 	];
-menus.forEach(m => {
-	m.init();
+	console.log(document.getElementsByClassName("games-list"));
+	menus.forEach(m => {
+		m.init();
 
-	m.getPages().forEach((p, i) => {
-		m.getItems(i).forEach(item => {
-			item.addEventListener("mouseenter", () => {
-				m.goto(item);
+		m.getPages().forEach((p, i) => {
+			m.getItems(i).forEach(item => {
+				item.addEventListener("mouseenter", () => {
+					m.goto(item);
+				});
 			});
 		});
 	});
@@ -200,15 +205,15 @@ function pressUp() {
 function pressDown() {
 	menus[menu].down();
 }
-
+/*
 SkyRemote.createSkyRemote({
 	pressRed, pressGreen, pressYellow, pressBack, pressBlue, pressSelect, pressLeft, pressRight, pressUp, pressDown
-});
+});*/
 
 
-window.addEventListener("click", () => {
+/*window.addEventListener("click", () => {
 	if (!musicplayed) toggleMusic();
-});
+});*/
 
 Array.from(document.getElementsByClassName("game")).forEach(g => {
 
@@ -227,6 +232,6 @@ Array.from(document.getElementsByClassName("game")).forEach(g => {
 
 
 
-document.addEventListener("keyup", event => {
+/*document.addEventListener("keyup", event => {
 	if (!musicplayed) toggleMusic();
-});
+});*/

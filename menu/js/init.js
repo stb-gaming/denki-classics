@@ -1,8 +1,7 @@
 (async function () {
 	'use strict';
 
-	let lists = document.querySelectorAll('#games-lists .games-lists')[0],
-		triangleLeft = document.querySelectorAll(".triangle.left")[0];
+	let lists = document.querySelectorAll('#games-lists, .games-lists')[0];
 
 	function createPage() {
 		let page = document.createElement("div");
@@ -10,22 +9,28 @@
 
 		lists.appendChild(page);
 
-		// uncomment this is anything breaks
-		//lists.insertBefore(triangleLeft, page);
+
 
 		return page;
 	}
 
-	function createGame(page, gameInfo) {
-		let game = document.createElement("a");
-		Object.assign(game.dataset, gameInfo);
-		game.href = `javascript:SkyGames.launchGame(${game.url})"`;
+	/*
+	todo: create at the end of each page
+	<a class="triangle left" href="javascript:lastPage()"></a>
+	<a class="triangle right" href="javascript:nextPage()"></a>
+	*/
+
+	function createGame(page, game) {
+		let gameEl = document.createElement("a");
+		Object.assign(gameEl.dataset, game);
+		gameEl.href = `javascript:SkyGames.launchGame('${game.url}')"`;
 
 		let gameImage = new Image();
 		gameImage.src = "https://stb-gaming.github.io/sky-games/assets/img/games/" + (game.image || game.splash || game.menu || game.gameplay);
+		gameEl.appendChild(gameImage);
 
-		page.appendChild(game);
-		return game;
+		page.appendChild(gameEl);
+		return gameEl;
 
 	}
 
@@ -35,13 +40,13 @@
 		if (SkyGames.loadGames) {
 			const games = await SkyGames.loadGames(),
 				pageLength = 9,
-				pages = Math.round(games.length / pageLength);
+				pages = Math.ceil(games.length / pageLength);
 			for (let p = 0; p < pages; p++) {
 				let offset = p * pageLength,
 					page = createPage();
-				for (let g = offset; g - offset < pageLength || g < games.length; g++) {
-					const game = games[g];
-					createGame(page, game);
+				for (let g = 0; g < pageLength; g++) {
+					const game = games[offset + g];
+					if (game) createGame(page, game);
 				}
 			}
 		}
