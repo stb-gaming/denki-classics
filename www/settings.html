@@ -1,12 +1,9 @@
-<h2>Games Folders</h2>
-<form id="yes">
-
-	<input type="text" name="a" id="b">
-	<button type="submit">
-
+<h2>Settings</h2>
+<form id="settings" name="Settings">
+	<label for="games-folder">Games folder:</label>
+	<input type="text" name="gamesFolder" id="games-folder">
+	<button type="submit">Submit</button>
 </form>
-
-<h2>Games</h2>
 
 
 <script>
@@ -15,15 +12,11 @@
 	 * @param form {HTMLFormElement}
 	 */
 	function getFormData(form) {
-		return Array.from(form.querySelectorAll("input select")).reduce((obj, { name, value }) => {
-			obj[name] = value;
-			return obj;
-		}, {});
-	}
-	function getFormDataAlt(form) {
-		return Array.from(new FormData(form).entries()).reduce((obj, [k, v]) => {
-			obj[k] = v;
-		}, {});
+		let data = new FormData(form);
+		let obj = {};
+
+		data.forEach((value, key) => { obj[key] = value });
+		return obj;
 	}
 
 	function setFormData(form, data) {
@@ -32,12 +25,11 @@
 		}
 	}
 
-	let form = document.getElementById("yes");
+	let form = document.getElementById("settings");
+	
 	function loadSettings(settings) {
 		// put stuff into form
 		setFormData(form, settings);
-
-
 	}
 	SkyGames.loadSettings().then(loadSettings);
 
@@ -49,7 +41,7 @@
 		e.preventDefault();
 
 		///TODO: get form fields
-		let setings = getFormData(e.target);
+		let settings = getFormData(e.target);
 
 		try {
 			await SkyGames.saveSettings(settings);
