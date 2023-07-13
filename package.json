@@ -4,6 +4,7 @@
 	"description": "Beehive Bedlam, just Beehive Bedlam",
 	"main": "index.js",
 	"scripts": {
+		"prestart": "npm i && npm run buildSass",
 		"start": "electron .",
 		"watchSass": "sass --watch menu/scss:menu/css",
 		"buildSass": "sass menu/scss:menu/css",

@@ -5,6 +5,7 @@ const { fileReadable } = require("./utils");
 const fs = require("fs/promises");
 const path = require('path');
 
+
 const createWindow = () => {
 	const win = new BrowserWindow({
 		// frame: false,
@@ -29,12 +30,12 @@ app.whenReady().then(async () => {
 	app.gamesYaml = path.join(app.userDataPath, "games.yml");
 
 	if (!await fileReadable(app.settingsPath)) {
-		await fs.writeFile(app.settingsPath, JSON.stringify(require("./defaults"), null, 2))
+		await fs.writeFile(app.settingsPath, JSON.stringify(require("./defaults"), null, 2));
 	}
 	if (await fileReadable(app.gamesYaml)) {
-		console.log(`games.yml exists in ${app.userDataPath}: OK!`)
+		console.log(`games.yml exists in ${app.userDataPath}: OK!`);
 	} else {
-		console.error(`games.yml doesn't exist yet - downloading to ${app.gamesYaml}`)
+		console.error(`games.yml doesn't exist yet - downloading to ${app.gamesYaml}`);
 		await downloadFile("https://raw.githubusercontent.com/stb-gaming/sky-games/master/_data/games.yml", app.userDataPath);
 	}
 
