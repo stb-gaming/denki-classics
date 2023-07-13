@@ -1,9 +1,8 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
-const { downloadFile, downloadGame } = require("./download");
+const { downloadFile } = require("./download");
 const { fileReadable } = require("./utils");
+
 const path = require('path');
-const fs = require('fs/promises');
-const yml = require('yml');
 
 const createWindow = () => {
 	const win = new BrowserWindow({
@@ -23,52 +22,6 @@ const createWindow = () => {
 	return win;
 };
 
-const getSettings = async () => {
-	const json = await fs.readFile(app.settingsPath);
-	return JSON.parse(json);
-};
-
-const ipcHandlers = {
-	'getFolder': () => app.userDataPath,
-	'savesettings': async (event, settings) => {
-		await fs.writeFile(app.settingsPath, JSON.stringify(settings, null, 2));
-	},
-	'loadsettings': async () => await getSettings(),
-	'launchgame': async (event, id) => {
-		const settings = await getSettings();
-		const gamePath = settings.gamesFolder;
-		const gameFiles = ["app.html", "app.js", "app.wasm", "app.data"];
-
-		let gameInstalled = true;
-
-		for (const file of gameFiles) {
-			if (!fileReadable(path.join(gamePath, id, file))) {
-				gameInstalled = false;
-				break;
-			}
-		}
-
-		if (!gameInstalled) {
-			return false;
-		} else {
-			app.mainWindow.loadFile(path.join(gamePath, id, "app.html"));
-			return true;
-		}
-	},
-	'installgame': async (event, id) => {
-		const settings = await getSettings();
-		const gamePath = settings.gamesFolder;
-		await downloadGame(id, gamePath);
-	},
-	'loadgames': async () => {
-		/*
-		//const yml = await fs.readFile(app.gamesYaml);
-		//return yaml.parse(yml)
-		*/
-		return yml.load(app.gamesYaml);
-	}
-};
-
 app.whenReady().then(async () => {
 	app.userDataPath = app.getPath("userData");
 	app.settingsPath = path.join(app.userDataPath, "settings.json");
@@ -81,7 +34,7 @@ app.whenReady().then(async () => {
 		await downloadFile("https://raw.githubusercontent.com/stb-gaming/sky-games/master/_data/games.yml", app.userDataPath);
 	}
 
-	Object.entries(ipcHandlers).forEach(([channel, func]) => {
+	Object.entries(require("./handlers")).forEach(([channel, func]) => {
 		ipcMain.handle(channel, func);
 	});
 	app.mainWindow = createWindow();
