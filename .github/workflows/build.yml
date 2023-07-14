@@ -6,28 +6,18 @@ on:
       - master
       - develop
       - 'feature/design'
-#   pull_request:
-#     types:
-#       - opened
-#       - synchronize
+  pull_request:
+    types:
+      - opened
+      - synchronize
+  release:
+    types:
+      - published
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
-        include:
-          - os: windows-latest
-            buildScript: buildWindows
-            releaseFileExtension: .exe
-          - os: ubuntu-latest
-            buildScript: buildLinux
-            releaseFileExtension: .AppImage
-          - os: macos-latest
-            buildScript: buildMac
-            releaseFileExtension: .pkg
+  build-windows:
+    runs-on: windows-latest
+    if: ${{ matrix.os == 'windows-latest' }}
 
     steps:
       - name: Checkout code
@@ -41,34 +31,104 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build Electron application
-        run: npm run ${{ matrix.buildScript }}
+      - name: Build Windows Electron application
+        run: npm run buildWindows
+
+  build-linux:
+    runs-on: ubuntu-latest
+    if: ${{ matrix.os == 'ubuntu-latest' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18.16.1
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Linux Electron application
+        run: npm run buildLinux
+
+  build-macos:
+    runs-on: macos-latest
+    if: ${{ matrix.os == 'macos-latest' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18.16.1
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build macOS Electron application
+        run: npm run buildMac
+
+  create-release:
+    needs: [build-windows, build-linux, build-macos]
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/feature/design' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18.16.1
 
       - name: Get package version
         id: package_version
         run: echo "::set-output name=version::$(node -p "require('./package.json').version")"
 
       - name: Create release
-        if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/feature/design' }}
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
           tag_name: v${{ steps.package_version.outputs.version }}
-          release_name: Release ${{ steps.package_version.outputs.version }}
+          release_name: ${{ github.ref != 'refs/heads/master' ? 'Pre-release' : 'Release' }} ${{ steps.package_version.outputs.version }}
           body: |
-            Release ${{ steps.package_version.outputs.version }}
+            ${{ github.ref != 'refs/heads/master' ? 'Pre-release' : 'Release' }} ${{ steps.package_version.outputs.version }}
           draft: false
-          prerelease: ${{ github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/feature/design' }}
+          prerelease: ${{ github.ref != 'refs/heads/master' }}
 
-      - name: Upload release asset
-        id: upload-release-asset
+      - name: Upload Windows release asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }}
-          asset_name: denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }}
+          asset_path: ./dist/denki-classics-${{ steps.package_version.outputs.version }}.exe
+          asset_name: denki-classics-${{ steps.package_version.outputs.version }}.exe
+          asset_content_type: application/octet-stream
+
+      - name: Upload Linux release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/denki-classics-${{ steps.package_version.outputs.version }}.AppImage
+          asset_name: denki-classics-${{ steps.package_version.outputs.version }}.AppImage
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/denki-classics-${{ steps.package_version.outputs.version }}.pkg
+          asset_name: denki-classics-${{ steps.package_version.outputs.version }}.pkg
           asset_content_type: application/octet-stream
