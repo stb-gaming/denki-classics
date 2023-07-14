@@ -36,7 +36,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: windows-artifact
-          path: ./dist/denki-classics*.exe
+          path: ./dist/denki-classics*
 
   build-linux:
     runs-on: ubuntu-latest
@@ -60,7 +60,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: linux-artifact
-          path: ./dist/denki-classics*.AppImage
+          path: ./dist/denki-classics*
 
   build-macos:
     runs-on: macos-latest
@@ -84,7 +84,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: mac-artifact
-          path: ./dist/denki-classics*.pkg
+          path: ./dist/denki-classics*
 
   create-release:
     needs: [build-windows, build-linux, build-macos]
