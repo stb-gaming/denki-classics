@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require("electron");
+const { app, dialog, BrowserWindow } = require("electron");
 const { fileReadable } = require("./utils");
 const { downloadGame } = require("./download");
 
@@ -50,12 +50,5 @@ const ipcHandlers = module.exports = {
 		*/
 		return yml.load(app.gamesYaml);
 	},
-	'getcss': async () => {
-		//TODO: return an array of css paths from assets.js
-
-	},
-	'getjs': async () => {
-		//TODO: return an array of js paths from assets.js
-
-	}
+	'opendirectory': async () => await dialog.showOpenDialog(BrowserWindow.getFocusedWindow(), { properties: ['openDirectory'] })
 };

@@ -1,12 +1,26 @@
 <h2>Settings</h2>
-<form id="settings" name="Settings">
-	<label for="games-folder">Games folder:</label>
-	<input type="text" name="gamesFolder" id="games-folder">
-	<button type="submit">Submit</button>
-</form>
+<div class="set-game-dir" style="white-space: nowrap">
+	<p>Select the folder where games are to be stored:</p>
+	<span id="settings-dir"></span>
+	<button onclick="openDirectory()">Choose</button>
+</div>
 
+<form id="settings"></form>
+<button onclick="saveSettings()">Save</button>
 
 <script>
+
+	async function openDirectory() {
+		const dialogRet = await SkyGames.openDirectoryDialog();
+		const selectedDir = dialogRet.filePaths[0];
+
+		const settingsDirEl = document.getElementById("settings-dir")
+
+		settingsDirEl.innerHTML = selectedDir;
+		settingsDirEl.style = "border-style: solid; border-spacing: 10px"
+
+		return selectedDir;
+	}
 
 	/**
 	 * @param form {HTMLFormElement}
@@ -25,12 +39,14 @@
 		}
 	}
 
-	let form = document.getElementById("settings");
-
 	function loadSettings(settings) {
 		// put stuff into form
-		setFormData(form, settings);
+		const settingsDirEl = document.getElementById("settings-dir")
+
+		settingsDirEl.innerHTML = settings.gamesFolder;
+		settingsDirEl.style = "border-style: solid; border-spacing: 10px"
 	}
+	
 	SkyGames.loadSettings().then(loadSettings);
 
 
