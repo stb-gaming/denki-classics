@@ -7,9 +7,18 @@
 		let page = document.createElement("div");
 		page.classList.add("games-list");
 
+		let leftTriangle = document.createElement("a");
+		leftTriangle.classList.add("triangle", "left");
+		leftTriangle.href = "javascript:lastPage()";
+
+		let rightTriangle = document.createElement("a");
+		rightTriangle.classList.add("triangle", "right");
+		rightTriangle.href = "javascript:nextPage()";
+
+		page.appendChild(leftTriangle);
+		page.appendChild(rightTriangle);
+
 		lists.appendChild(page);
-
-
 
 		return page;
 	}
@@ -22,6 +31,7 @@
 
 	function createGame(page, game) {
 		let gameEl = document.createElement("a");
+		gameEl.classList.add("game");
 		Object.assign(gameEl.dataset, game);
 
 		const gameUrlParts = game.url.split("/")
@@ -57,7 +67,7 @@
 
 
 function pressBlue() {
-	window.location = "../settings.html";
+	window.location = "../www/settings.html";
 }
 
 if (typeof SkyRemote != "undefined") {
