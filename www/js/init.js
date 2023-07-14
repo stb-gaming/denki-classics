@@ -23,7 +23,7 @@
 	function createGame(page, game) {
 		let gameEl = document.createElement("a");
 		Object.assign(gameEl.dataset, game);
-		gameEl.href = `javascript:SkyGames.launchGame('${game.url}')"`;
+		gameEl.href = `javascript:SkyGames.launchGame('${game.id}')`;
 
 		let gameImage = new Image();
 		gameImage.src = "https://stb-gaming.github.io/sky-games/assets/img/games/" + (game.image || game.splash || game.menu || game.gameplay);
