@@ -1,11 +1,14 @@
-name: Build and Release Electron Application
+name: Build Electron Application
 
 on:
   push:
     branches:
       - master
       - develop
-      - feature/design
+  pull_request:
+    types:
+      - opened
+      - synchronize
 
 jobs:
   build:
@@ -28,76 +31,70 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.pull_request.base.ref }}
-
-		- name: Get Node.js version
-		  id: get_node_version
-		  run: |
-			if [ -f ".node-version" ]; then
-			node_version=$(cat .node-version)
-			elif [ -f ".nvmrc" ]; then
-			if [ "$RUNNER_OS" == "Windows" ]; then
-				node_version=$(Get-Content .nvmrc).Trim()
-			else
-				node_version=$(cat .nvmrc)
-			fi
-			fi
-			node_version="${node_version//v/}" # Remove 'v' prefix if present
-			echo "::set-output name=node_version::$node_version"
 
 
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: ${{ steps.get_node_version.outputs.node_version }}
+          node-version: 18.16.1
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Get package version
-        id: version
-        run: echo ::set-output name=version::$(node -p "require('./package.json').version")
-
       - name: Build Electron application
         run: npm run ${{ matrix.buildScript }}
 
+      - name: Get package version
+        id: package_version
+        run: echo "::set-output name=version::$(node -p "require('./package.json').version")"
+
       - name: Create release
-        if: startsWith(github.ref, 'refs/tags/')
+        if: ${{ github.ref == 'refs/heads/master' }}
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: v${{ steps.package_version.outputs.version }}
+          release_name: Release ${{ steps.package_version.outputs.version }}
           body: |
-            Release ${{ github.ref }}
+            Release ${{ steps.package_version.outputs.version }}
           draft: false
           prerelease: false
 
       - name: Create pre-release
-        #if: startsWith(github.ref, 'refs/heads/develop')
-        if: startsWith(github.ref, 'refs/heads/feature/interface')
         id: create_prerelease
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          tag_name: ${{ github.sha }}
-          release_name: Pre-release ${{ github.sha }}
+          tag_name: v${{ steps.package_version.outputs.version }}
+          release_name: Pre-release ${{ steps.package_version.outputs.version }}
           body: |
-            Pre-release ${{ github.sha }}
+            Pre-release ${{ steps.package_version.outputs.version }}
           draft: false
           prerelease: true
 
       - name: Upload release asset
+        if: ${{ github.event_name == 'release' && steps.create_release.outputs.release_id }}
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/denki-classics-${{ steps.version.outputs.version }}${{ matrix.releaseFileExtension }}
-          asset_name: denki-classics-${{ steps.version.outputs.version }}${{ matrix.releaseFileExtension }}
+          asset_path: ./dist/denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }}
+          asset_name: denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }}
+          asset_content_type: application/octet-stream
+
+      - name: Upload pre-release asset
+        if: ${{ github.event_name == 'release' && steps.create_prerelease.outputs.release_id }}
+        id: upload-prelease-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_prerelease.outputs.upload_url }}
+          asset_path: ./dist/denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }}
+          asset_name: denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }}
           asset_content_type: application/octet-stream
