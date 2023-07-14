@@ -1,5 +1,6 @@
 name: Build and Release Electron Application
-
+permissions:
+  contents: write
 on:
   push:
     branches:
@@ -149,28 +150,41 @@ jobs:
           draft: false
           prerelease: ${{ github.ref != 'refs/heads/master' }}
 
+       - run: |
+          set -x
+          assets=()
+          for asset in ./dist/*; do
+          assets+=("-a" "$asset")
+          done
+          tag_name="${GITHUB_REF##*/}"
+          hub release create "${assets[@]}" -m "$tag_name" "$tag_name"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Upload release assets
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+            GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: |
-            ./dist/denki-classics ${{ steps.package_info.outputs.version }}.exe
-            ./dist/denki-classics-${{ steps.package_info.outputs.version }}.AppImage
-            ./dist/denki-classics-${{ steps.package_info.outputs.version }}.pkg
-            ./dist/denki-classics-${{ steps.package_info.outputs.version }}-win.zip
-            ./dist/denki-classics-${{ steps.package_info.outputs.version }}-ia32-win.zip
-            ./dist/denki-classics-${{ steps.package_info.outputs.version }}.tar.gz
-            ./dist/denki-classics-${{ steps.package_info.outputs.version }}-mac.zip
-            ./dist/denki-classics-${{ steps.package_info.outputs.version }}-mac.zip.blockmap
-          asset_name: |
-            denki-classics-${{ steps.package_info.outputs.version }}-windows.exe
-            denki-classics-${{ steps.package_info.outputs.version }}-linux.AppImage
-            denki-classics-${{ steps.package_info.outputs.version }}-mac.pkg
-            denki-classics-${{ steps.package_info.outputs.version }}-win64.zip
-            denki-classics-${{ steps.package_info.outputs.version }}-win32.zip,
-            denki-classics-${{ steps.package_info.outputs.version }}-linux.tar.gz
-            denki-classics-${{ steps.package_info.outputs.version }}-mac.zip
-            denki-classics-${{ steps.package_info.outputs.version }}-mac.zip.blockmap
-          asset_content_type: application/octet-stream
+            upload_url: ${{ steps.create_release.outputs.upload_url }}
+            file_path: ${{ matrix.file_path }}
+            file_name: ${{ matrix.file_name }}
+            asset_content_type: application/octet-stream
+        matrix:
+            include:
+            - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}.exe"
+              file_name: "denki-classics-${{ steps.package_info.outputs.version }}-windows.exe"
+            - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}.AppImage"
+              file_name: "denki-classics-${{ steps.package_info.outputs.version }}-linux.AppImage"
+            - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}.pkg"
+              file_name: "denki-classics-${{ steps.package_info.outputs.version }}-mac.pkg"
+            - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}-win.zip"
+              file_name: "denki-classics-${{ steps.package_info.outputs.version }}-win64.zip"
+            - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}-ia32-win.zip"
+              file_name: "denki-classics-${{ steps.package_info.outputs.version }}-win32.zip"
+            - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}.tar.gz"
+              file_name: "denki-classics-${{ steps.package_info.outputs.version }}-linux.tar.gz"
+            - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}-mac.zip"
+              file_name: "denki-classics-${{ steps.package_info.outputs.version }}-mac.zip"
+            - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}-mac.zip.blockmap"
+              file_name: "denki-classics-${{ steps.package_info.outputs.version }}-mac.zip.blockmap"
