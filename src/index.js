@@ -21,6 +21,8 @@ const createWindow = async () => {
 
 	win.loadFile('www/index.html');
 
+	// win.webContents.openDevTools();
+
 	async function injectFile(file) {
 		let pathParts = file.split(".");
 
@@ -40,6 +42,7 @@ const createWindow = async () => {
 		console.log("here", win.webContents.getURL());
 
 		await injectFile("sky-remote.user.js");
+		await injectFile("gamepad-support.user.js");
 		let url = win.webContents.getURL();
 		if (url.includes("app.asr") || url.includes("www/")) {
 			await injectFile("menu.js");
@@ -71,13 +74,15 @@ app.whenReady().then(async () => {
 		userscripts: path.join(app.assetsRoot, "userscripts"),
 	};
 
-	Object.entries(app.assetsPaths).forEach(async ([type, path]) => {
-		if (!await fileReadable(path)) {
-			await fs.mkdir(path, { recursive: true });
+	Object.entries(app.assetsPaths).forEach(async ([type, filePath]) => {
+		if (!await fileReadable(filePath)) {
+			await fs.mkdir(filePath, { recursive: true });
 		}
 		Object.values(assets[type]).forEach(async assetUrl => {
-			if (!await fileReadable(path)) {
-				await downloadFile(assetUrl, path);
+			const urlParts = assetUrl.split("/")
+			const destPath = path.join(filePath, urlParts[urlParts.length - 1])
+			if (!await fileReadable(destPath)) {
+				await downloadFile(assetUrl, filePath);
 			}
 		});
 	});
