@@ -71,3 +71,4 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./dist/denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }}
           asset_name: denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }}
+          asset_content_type: application/octet-stream
