@@ -178,3 +178,4 @@ jobs:
             denki-classics-${{ steps.package_info.outputs.version }}-linux.tar.gz
             denki-classics-${{ steps.package_info.outputs.version }}-mac.zip,
             denki-classics-${{ steps.package_info.outputs.version }}-mac.zip.blockmap
+          asset_content_type: application/octet-stream
