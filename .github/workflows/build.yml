@@ -31,20 +31,20 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.base.ref }}
 
-		- name: Get Node.js version
-		  id: get_node_version
-		  run: |
-			if [ -f ".node-version" ]; then
-			node_version=$(cat .node-version)
-			elif [ -f ".nvmrc" ]; then
-			if [ "$RUNNER_OS" == "Windows" ]; then
-				node_version=$(Get-Content .nvmrc).Trim()
-			else
-				node_version=$(cat .nvmrc)
-			fi
-			fi
-			node_version="${node_version//v/}" # Remove 'v' prefix if present
-			echo "::set-output name=node_version::$node_version"
+        - name: Get Node.js version
+          id: get_node_version
+          run: |
+            if [ -f ".node-version" ]; then
+            node_version=$(cat .node-version)
+            elif [ -f ".nvmrc" ]; then
+            if [ "$RUNNER_OS" == "Windows" ]; then
+                node_version=$(Get-Content .nvmrc).Trim()
+            else
+                node_version=$(cat .nvmrc)
+            fi
+            fi
+            node_version="${node_version//v/}" # Remove 'v' prefix if present
+            echo "::set-output name=node_version::$node_version"
 
 
       - name: Setup Node.js
