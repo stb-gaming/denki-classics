@@ -38,10 +38,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: windows-artifact
-          path: |
-            ./dist/denki-classics ${{ steps.package_info.outputs.version }}.exe,
-            ./dist/denki-classics-${{ steps.package_info.outputs.version }}-win.zip,
-            ./dist/denki-classics-${{ steps.package_info.outputs.version }}-ia32-win.zip
+          path: ./dist/denki-classics*
 
   build-linux:
     runs-on: ubuntu-latest
@@ -69,9 +66,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: linux-artifact
-          path: |
-            ./dist/denki-classics-${{ steps.package_info.outputs.version }}.AppImage,
-            ./dist/denki-classics-${{ steps.package_info.outputs.version }}.tar.gz
+          path: ./dist/denki-classics*
 
   build-macos:
     runs-on: macos-latest
@@ -99,10 +94,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: macos-artifact
-          path: |
-            ./dist/denki-classics-${{ steps.package_info.outputs.version }}.pkg,
-            ./dist/denki-classics-${{ steps.package_info.outputs.version }}-mac.zip,
-            ./dist/denki-classics-${{ steps.package_info.outputs.version }}-mac.zip.blockmap
+          path: ./dist/denki-classics*
 
   create-release:
     needs: [build-windows, build-linux, build-macos]
