@@ -80,7 +80,7 @@ jobs:
           prerelease: true
 
       - name: Upload release asset
-        if: ${{ github.event_name == 'release' && github.event.action == 'published' && steps.create_release.outputs.release_id }}
+        if: ${{ steps.create_release.outputs.release_id }}
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
@@ -91,7 +91,7 @@ jobs:
           asset_name: denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }}
 
       - name: Upload pre-release asset
-        if: ${{ github.event_name == 'release' && github.event.action == 'published' && steps.create_prerelease.outputs.release_id }}
+        if: ${{ steps.create_prerelease.outputs.release_id }}
         id: upload-prelease-asset
         uses: actions/upload-release-asset@v1
         env:
