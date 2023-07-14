@@ -102,6 +102,22 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/feature/design' }}
 
+    matrix:
+        include:
+        - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}.exe"
+            file_name: "denki-classics-${{ steps.package_info.outputs.version }}-windows.exe"
+        - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}.AppImage"
+            file_name: "denki-classics-${{ steps.package_info.outputs.version }}-linux.AppImage"
+        - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}.pkg"
+            file_name: "denki-classics-${{ steps.package_info.outputs.version }}-mac.pkg"
+        - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}-win.zip"
+            file_name: "denki-classics-${{ steps.package_info.outputs.version }}-win64.zip"
+        - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}-ia32-win.zip"
+            file_name: "denki-classics-${{ steps.package_info.outputs.version }}-win32.zip"
+        - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}.tar.gz"
+            file_name: "denki-classics-${{ steps.package_info.outputs.version }}-linux.tar.gz"
+        - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}-mac.zip"
+            file_name: "denki-classics-${{ steps.package_info.outputs"
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -160,19 +176,3 @@ jobs:
           asset_path: ${{ matrix.file_path }}
           asset_name: ${{ matrix.file_name }}
           asset_content_type: application/octet-stream
-        matrix:
-          include:
-            - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}.exe"
-              file_name: "denki-classics-${{ steps.package_info.outputs.version }}-windows.exe"
-            - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}.AppImage"
-              file_name: "denki-classics-${{ steps.package_info.outputs.version }}-linux.AppImage"
-            - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}.pkg"
-              file_name: "denki-classics-${{ steps.package_info.outputs.version }}-mac.pkg"
-            - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}-win.zip"
-              file_name: "denki-classics-${{ steps.package_info.outputs.version }}-win64.zip"
-            - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}-ia32-win.zip"
-              file_name: "denki-classics-${{ steps.package_info.outputs.version }}-win32.zip"
-            - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}.tar.gz"
-              file_name: "denki-classics-${{ steps.package_info.outputs.version }}-linux.tar.gz"
-            - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}-mac.zip"
-              file_name: "denki-classics-${{ steps.package_info.outputs"
