@@ -23,7 +23,9 @@
 	function createGame(page, game) {
 		let gameEl = document.createElement("a");
 		Object.assign(gameEl.dataset, game);
-		gameEl.href = `javascript:SkyGames.launchGame('${game.url}')"`;
+
+		const gameUrlParts = game.url.split("/")
+		gameEl.href = `javascript:SkyGames.launchGame('${gameUrlParts[gameUrlParts.length - 2]}')`;
 
 		let gameImage = new Image();
 		gameImage.src = "https://stb-gaming.github.io/sky-games/assets/img/games/" + (game.image || game.splash || game.menu || game.gameplay);
@@ -55,7 +57,7 @@
 
 
 function pressBlue() {
-	window.location = "../www/settings.html";
+	window.location = "../settings.html";
 }
 
 if (typeof SkyRemote != "undefined") {
