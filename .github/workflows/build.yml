@@ -156,21 +156,21 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: |
-            ./dist/denki-classics ${{ steps.package_info.outputs.version }}.exe,
-            ./dist/denki-classics-${{ steps.package_info.outputs.version }}.AppImage,
-            ./dist/denki-classics-${{ steps.package_info.outputs.version }}.pkg,
-            ./dist/denki-classics-${{ steps.package_info.outputs.version }}-win.zip,
-            ./dist/denki-classics-${{ steps.package_info.outputs.version }}-ia32-win.zip,
-            ./dist/denki-classics-${{ steps.package_info.outputs.version }}.tar.gz,
-            ./dist/denki-classics-${{ steps.package_info.outputs.version }}-mac.zip,
+            ./dist/denki-classics ${{ steps.package_info.outputs.version }}.exe
+            ./dist/denki-classics-${{ steps.package_info.outputs.version }}.AppImage
+            ./dist/denki-classics-${{ steps.package_info.outputs.version }}.pkg
+            ./dist/denki-classics-${{ steps.package_info.outputs.version }}-win.zip
+            ./dist/denki-classics-${{ steps.package_info.outputs.version }}-ia32-win.zip
+            ./dist/denki-classics-${{ steps.package_info.outputs.version }}.tar.gz
+            ./dist/denki-classics-${{ steps.package_info.outputs.version }}-mac.zip
             ./dist/denki-classics-${{ steps.package_info.outputs.version }}-mac.zip.blockmap
           asset_name: |
-            denki-classics-${{ steps.package_info.outputs.version }}-windows.exe,
-            denki-classics-${{ steps.package_info.outputs.version }}-linux.AppImage,
-            denki-classics-${{ steps.package_info.outputs.version }}-mac.pkg,
-            denki-classics-${{ steps.package_info.outputs.version }}-win64.zip,
+            denki-classics-${{ steps.package_info.outputs.version }}-windows.exe
+            denki-classics-${{ steps.package_info.outputs.version }}-linux.AppImage
+            denki-classics-${{ steps.package_info.outputs.version }}-mac.pkg
+            denki-classics-${{ steps.package_info.outputs.version }}-win64.zip
             denki-classics-${{ steps.package_info.outputs.version }}-win32.zip,
             denki-classics-${{ steps.package_info.outputs.version }}-linux.tar.gz
-            denki-classics-${{ steps.package_info.outputs.version }}-mac.zip,
+            denki-classics-${{ steps.package_info.outputs.version }}-mac.zip
             denki-classics-${{ steps.package_info.outputs.version }}-mac.zip.blockmap
           asset_content_type: application/octet-stream
