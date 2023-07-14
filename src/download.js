@@ -24,7 +24,6 @@ const downloadGame = async (id, gamesPath) => {
 
     try {
         await fs.access(destPath, fs.constants.R_OK)
-        console.log("Game exists")
     } catch (err) {
         if (err.code === "ENOENT") {
             await fs.mkdir(destPath, { recursive: true })
