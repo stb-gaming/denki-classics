@@ -150,28 +150,18 @@ jobs:
           draft: false
           prerelease: ${{ github.ref != 'refs/heads/master' }}
 
-       - run: |
-          set -x
-          assets=()
-          for asset in ./dist/*; do
-          assets+=("-a" "$asset")
-          done
-          tag_name="${GITHUB_REF##*/}"
-          hub release create "${assets[@]}" -m "$tag_name" "$tag_name"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload release assets
         uses: actions/upload-release-asset@v1
         env:
-            GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }}
-            file_path: ${{ matrix.file_path }}
-            file_name: ${{ matrix.file_name }}
-            asset_content_type: application/octet-stream
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ matrix.file_path }}
+          asset_name: ${{ matrix.file_name }}
+          asset_content_type: application/octet-stream
         matrix:
-            include:
+          include:
             - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}.exe"
               file_name: "denki-classics-${{ steps.package_info.outputs.version }}-windows.exe"
             - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}.AppImage"
@@ -185,6 +175,4 @@ jobs:
             - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}.tar.gz"
               file_name: "denki-classics-${{ steps.package_info.outputs.version }}-linux.tar.gz"
             - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}-mac.zip"
-              file_name: "denki-classics-${{ steps.package_info.outputs.version }}-mac.zip"
-            - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}-mac.zip.blockmap"
-              file_name: "denki-classics-${{ steps.package_info.outputs.version }}-mac.zip.blockmap"
+              file_name: "denki-classics-${{ steps.package_info.outputs
