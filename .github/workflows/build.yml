@@ -5,7 +5,6 @@ on:
     branches:
       - master
       - develop
-      - 'feature/design'
   pull_request:
     types:
       - opened
@@ -59,7 +58,6 @@ jobs:
           prerelease: false
 
       - name: Create pre-release
-        if:  ${{ github.ref == 'refs/heads/feature/design' }}
         id: create_prerelease
         uses: actions/create-release@v1
         env:
