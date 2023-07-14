@@ -93,7 +93,7 @@ jobs:
   create-release:
     needs: [build-windows, build-linux, build-macos]
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/master' }}
+    if: ${{ github.ref == 'refs/heads/master'||github.ref == 'refs/heads/develop'||github.ref == 'refs/heads/feature/design' }}
 
     steps:
       - name: Checkout code
@@ -119,7 +119,7 @@ jobs:
           body: |
             Release ${{ steps.package_info.outputs.version }}
           draft: false
-          prerelease: ${{ github.ref == 'refs/heads/master' }}
+          prerelease: ${{ github.ref != 'refs/heads/master' }}
 
       - name: Upload Windows executable
         uses: actions/upload-release-asset@v1
