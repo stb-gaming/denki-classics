@@ -7,7 +7,7 @@ const path = require('path');
 const { isReadable } = require('stream');
 
 
-const createWindow = () => {
+const createWindow = async () => {
 	const win = new BrowserWindow({
 		// frame: false,
 		width: 850,
@@ -22,15 +22,34 @@ const createWindow = () => {
 
 	win.loadFile('www/index.html');
 
+	await win.webContents.insertCSS((await fs.readFile(path.join(app.assetsPaths.css, "base.css"))).toString());
+	await win.webContents.insertCSS(await (await fs.readFile(path.join(app.assetsPaths.css, "sky-games.css"))).toString());
+
+
+	win.webContents.on("did-finish-load", async () => {
+
+		console.log(win.representedFilename);
+
+		await win.webContents.executeJavaScript((await fs.readFile(path.join(app.assetsPaths.userscripts, "sky-remote.user.js"))).toString());
+		await win.webContents.executeJavaScript((await fs.readFile(path.join(app.assetsPaths.js, "menu.js"))).toString());
+		await win.webContents.executeJavaScript((await fs.readFile(path.join(app.assetsPaths.js, "sky-games.js"))).toString());
+
+
+	});
+
 	return win;
 };
 
+/*
+
+*/
+
 
 app.whenReady().then(async () => {
-	const assets = require("./assets")
+	const assets = require("./assets");
 
 	app.userDataPath = app.getPath("userData");
-	app.assetsRoot = path.join(app.userDataPath, "Assets")
+	app.assetsRoot = path.join(app.userDataPath, "Assets");
 	app.settingsPath = path.join(app.userDataPath, "settings.json");
 	app.gamesYaml = path.join(app.userDataPath, "games.yml");
 
@@ -46,8 +65,8 @@ app.whenReady().then(async () => {
 		}
 		Object.values(assets[type]).forEach(async assetUrl => {
 			await downloadFile(assetUrl, path);
-		})
-	})
+		});
+	});
 
 	if (!await fileReadable(app.settingsPath)) {
 		await fs.writeFile(app.settingsPath, JSON.stringify(require("./defaults"), null, 2));

@@ -4,10 +4,10 @@
 	"description": "Beehive Bedlam, just Beehive Bedlam",
 	"main": "index.js",
 	"scripts": {
-		"prestart": "npm i && npm run buildSass",
 		"start": "electron .",
 		"watchSass": "sass --watch www/scss:www/css",
 		"buildSass": "sass www/scss:www/css",
+		"build": "./build.bat",
 		"buildWindows": "electron-builder build --win portable zip --x64 --ia32 --publish never",
 		"buildLinux": "electron-builder build --linux AppImage tar.gz --publish never",
 		"buildMac": "electron-builder build --mac pkg --publish never"
@@ -28,6 +28,9 @@
 		"appId": "io.github.stb-gaming.denki-classics",
 		"mac": {
 			"category": "your.app.category.type"
+		},
+		"linux": {
+			"category": "Game"
 		},
 		"win": {
 			"icon": "assets/img/bee.ico"

@@ -8,5 +8,6 @@ contextBridge.exposeInMainWorld("SkyGames", {
 	launchGame: (id) => ipcRenderer.invoke('launchgame', id),
 	loadGames: () => ipcRenderer.invoke('loadgames'),
 	loadJs: () => ipcRenderer.invoke('loadjs'),
-	loadCss: () => ipcRenderer.invoke('loadcss')
+	loadCss: () => ipcRenderer.invoke('loadcss'),
+	on: (event, func) => ipcRenderer.on(event, func)
 });

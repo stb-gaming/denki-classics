@@ -61,3 +61,7 @@ function pressBlue() {
 if (typeof SkyRemote != "undefined") {
 	SkyRemote.onPressButton("blue", pressBlue);
 }
+
+SkyGames.on("test", () => {
+	console.log("hi");
+});
