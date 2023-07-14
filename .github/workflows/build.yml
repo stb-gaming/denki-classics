@@ -10,9 +10,6 @@ on:
     types:
       - opened
       - synchronize
-  release:
-    types:
-      - published
 
 jobs:
   build-windows:
@@ -32,6 +29,10 @@ jobs:
 
       - name: Build Windows
         run: npm run buildWindows
+
+      - name: Get package info
+        id: package_info
+        run: echo "::set-output name=version::$(node -p "require('./package.json').version")"
 
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v2
@@ -60,6 +61,10 @@ jobs:
       - name: Build Linux
         run: npm run buildLinux
 
+      - name: Get package info
+        id: package_info
+        run: echo "::set-output name=version::$(node -p "require('./package.json').version")"
+
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v2
         with:
@@ -85,6 +90,10 @@ jobs:
 
       - name: Build macOS
         run: npm run buildMac
+
+      - name: Get package info
+        id: package_info
+        run: echo "::set-output name=version::$(node -p "require('./package.json').version")"
 
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v2
