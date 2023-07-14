@@ -99,16 +99,19 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: windows-artifact
+          path: ./dist
 
       - name: Download Linux artifacts
         uses: actions/download-artifact@v2
         with:
           name: linux-artifact
+          path: ./dist
 
       - name: Download macOS artifacts
         uses: actions/download-artifact@v2
         with:
           name: mac-artifact
+          path: ./dist
 
       - name: Setup Node.js
         uses: actions/setup-node@v2
