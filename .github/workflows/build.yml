@@ -10,6 +10,9 @@ on:
     types:
       - opened
       - synchronize
+  release:
+    types:
+      - published
 
 jobs:
   build-windows:
@@ -30,6 +33,15 @@ jobs:
       - name: Build Windows
         run: npm run buildWindows
 
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows-artifact
+          path: |
+            ./dist/denki-classics ${{ steps.package_info.outputs.version }}.exe,
+            ./dist/denki-classics-${{ steps.package_info.outputs.version }}-win.zip,
+            ./dist/denki-classics-${{ steps.package_info.outputs.version }}-ia32-win.zip
+
   build-linux:
     runs-on: ubuntu-latest
 
@@ -47,6 +59,14 @@ jobs:
 
       - name: Build Linux
         run: npm run buildLinux
+
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux-artifact
+          path: |
+            ./dist/denki-classics-${{ steps.package_info.outputs.version }}.AppImage,
+            ./dist/denki-classics-${{ steps.package_info.outputs.version }}.tar.gz
 
   build-macos:
     runs-on: macos-latest
@@ -66,6 +86,15 @@ jobs:
       - name: Build macOS
         run: npm run buildMac
 
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: macos-artifact
+          path: |
+            ./dist/denki-classics-${{ steps.package_info.outputs.version }}.pkg,
+            ./dist/denki-classics-${{ steps.package_info.outputs.version }}-mac.zip,
+            ./dist/denki-classics-${{ steps.package_info.outputs.version }}-mac.zip.blockmap
+
   create-release:
     needs: [build-windows, build-linux, build-macos]
     runs-on: ubuntu-latest
@@ -79,6 +108,24 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 18.16.1
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: windows-artifact
+          path: ./dist/
+
+      - name: Download Linux artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: linux-artifact
+          path: ./dist/
+
+      - name: Download macOS artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: macos-artifact
+          path: ./dist/
 
       - name: Get package info
         id: package_info
@@ -98,16 +145,12 @@ jobs:
           draft: false
           prerelease: ${{ github.ref != 'refs/heads/master' }}
 
-      - name: Upload release asset
+      - name: Upload release assets
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-
-
-# denki-classics-0.0.1-ia32-win.zip
-# denki-classics-0.0.1.tar.gz
           asset_path: |
             ./dist/denki-classics ${{ steps.package_info.outputs.version }}.exe,
             ./dist/denki-classics-${{ steps.package_info.outputs.version }}.AppImage,
@@ -126,4 +169,3 @@ jobs:
             denki-classics-${{ steps.package_info.outputs.version }}-linux.tar.gz
             denki-classics-${{ steps.package_info.outputs.version }}-mac.zip,
             denki-classics-${{ steps.package_info.outputs.version }}-mac.zip.blockmap
-          asset_content_type: application/octet-stream
