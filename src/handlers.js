@@ -1,16 +1,17 @@
-const { app } = require("electron");
+const { app, BrowserWindow } = require("electron");
 const { fileReadable } = require("./utils");
 const { downloadGame } = require("./download");
 
 const yml = require("yml");
 const fs = require("fs/promises");
+const path = require("path");
 
 const getSettings = async () => {
 	const json = await fs.readFile(app.settingsPath);
 	return JSON.parse(json);
 };
 
-module.exports = {
+const ipcHandlers = module.exports = {
 	'getFolder': () => app.getPath("userData"),
 	'savesettings': async (event, settings) => {
 		await fs.writeFile(app.settingsPath, JSON.stringify(settings, null, 2));
@@ -31,11 +32,11 @@ module.exports = {
 		}
 
 		if (!gameInstalled) {
-			return false;
-		} else {
-			app.mainWindow.loadFile(path.join(gamePath, id, "app.html"));
-			return true;
+			await ipcHandlers.installgame(event, id)
 		}
+		
+		BrowserWindow.getFocusedWindow().loadFile(path.join(gamePath, id, "app.html"));
+		
 	},
 	'installgame': async (event, id) => {
 		const settings = await getSettings();

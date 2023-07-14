@@ -4,7 +4,6 @@ const { fileReadable } = require("./utils");
 
 const fs = require("fs/promises");
 const path = require('path');
-const { isReadable } = require('stream');
 
 
 const createWindow = async () => {
@@ -60,11 +59,13 @@ app.whenReady().then(async () => {
 	};
 
 	Object.entries(app.assetsPaths).forEach(async ([type, path]) => {
-		if (!isReadable(path)) {
+		if (!await fileReadable(path)) {
 			await fs.mkdir(path, { recursive: true });
 		}
 		Object.values(assets[type]).forEach(async assetUrl => {
-			await downloadFile(assetUrl, path);
+			if (!await fileReadable(path)) {
+				await downloadFile(assetUrl, path);
+			}
 		});
 	});
 
