@@ -95,6 +95,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Download Windows artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: windows-artifact
+
+      - name: Download Linux artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: linux-artifact
+
+      - name: Download macOS artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: mac-artifact
+
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
