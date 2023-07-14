@@ -32,6 +32,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Set up Permissions
+        run: |
+          echo "::set-env name=GITHUB_TOKEN::${{ secrets.RELEASE_TOKEN }}"
+          echo "::add-path::/usr/local/bin"
+
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
