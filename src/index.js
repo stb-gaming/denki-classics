@@ -21,18 +21,31 @@ const createWindow = async () => {
 
 	win.loadFile('www/index.html');
 
-	await win.webContents.insertCSS((await fs.readFile(path.join(app.assetsPaths.css, "base.css"))).toString());
-	await win.webContents.insertCSS(await (await fs.readFile(path.join(app.assetsPaths.css, "sky-games.css"))).toString());
+	async function injectFile(file) {
+		let pathParts = file.split(".");
+
+		if (pathParts[pathParts.length - 1] == "css") {
+			await win.webContents.insertCSS((await fs.readFile(path.join(app.assetsPaths.css, file))).toString());
+		} else {
+			await win.webContents.executeJavaScript((await fs.readFile(path.join(app.assetsPaths[pathParts[pathParts.length - 2] == "user" ? "userscripts" : "js"], file))).toString());
+		}
+
+	}
+
+	await injectFile("base.css");
+	await injectFile("sky-games.css");
 
 
 	win.webContents.on("did-finish-load", async () => {
+		console.log("here", win.webContents.getURL());
 
-		console.log(win.representedFilename);
+		await injectFile("sky-remote.user.js");
+		let url = win.webContents.getURL();
+		if (url.includes("app.asr") || url.includes("www/")) {
+			await injectFile("menu.js");
+			await injectFile("sky-games.js");
 
-		await win.webContents.executeJavaScript((await fs.readFile(path.join(app.assetsPaths.userscripts, "sky-remote.user.js"))).toString());
-		await win.webContents.executeJavaScript((await fs.readFile(path.join(app.assetsPaths.js, "menu.js"))).toString());
-		await win.webContents.executeJavaScript((await fs.readFile(path.join(app.assetsPaths.js, "sky-games.js"))).toString());
-
+		}
 
 	});
 
