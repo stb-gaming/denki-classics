@@ -7,7 +7,6 @@ contextBridge.exposeInMainWorld("SkyGames", {
 	installGame: (id) => ipcRenderer.invoke('installgame', id),
 	launchGame: (id) => ipcRenderer.invoke('launchgame', id),
 	loadGames: () => ipcRenderer.invoke('loadgames'),
-	loadJs: () => ipcRenderer.invoke('loadjs'),
-	loadCss: () => ipcRenderer.invoke('loadcss'),
+	openDirectoryDialog: () => ipcRenderer.invoke('opendirectory'),
 	on: (event, func) => ipcRenderer.on(event, func)
 });
