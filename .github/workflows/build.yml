@@ -15,9 +15,12 @@ on:
       - published
 
 jobs:
-  build-windows:
-    runs-on: windows-latest
-    if: ${{ matrix.os == 'windows-latest' }}
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
 
     steps:
       - name: Checkout code
@@ -31,51 +34,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build Windows Electron application
-        run: npm run buildWindows
-
-  build-linux:
-    runs-on: ubuntu-latest
-    if: ${{ matrix.os == 'ubuntu-latest' }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: 18.16.1
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build Linux Electron application
-        run: npm run buildLinux
-
-  build-macos:
-    runs-on: macos-latest
-    if: ${{ matrix.os == 'macos-latest' }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: 18.16.1
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build macOS Electron application
-        run: npm run buildMac
+      - name: Build Electron application
+        run: npm run build
 
   create-release:
-    needs: [build-windows, build-linux, build-macos]
+    needs: build
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/feature/design' }}
+
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
 
     steps:
       - name: Checkout code
@@ -104,42 +73,12 @@ jobs:
           draft: false
           prerelease: ${{ github.ref != 'refs/heads/master' }}
 
-  upload-assets:
-    needs: create-release
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'release' && github.event.action == 'published' }}
-
-    steps:
-      - name: Get package version
-        id: package_version
-        run: echo "::set-output name=version::$(node -p "require('./package.json').version")"
-
-      - name: Upload Windows release asset
+      - name: Upload release asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./dist/denki-classics-${{ steps.package_version.outputs.version }}.exe
-          asset_name: denki-classics-${{ steps.package_version.outputs.version }}.exe
-          asset_content_type: application/octet-stream
-
-      - name: Upload Linux release asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./dist/denki-classics-${{ steps.package_version.outputs.version }}.AppImage
-          asset_name: denki-classics-${{ steps.package_version.outputs.version }}.AppImage
-          asset_content_type: application/octet-stream
-
-      - name: Upload macOS release asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./dist/denki-classics-${{ steps.package_version.outputs.version }}.pkg
-          asset_name: denki-classics-${{ steps.package_version.outputs.version }}.pkg
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/denki-classics-${{ steps.package_version.outputs.version }}_${{ matrix.os }}
+          asset_name: denki-classics-${{ steps.package_version.outputs.version }}_${{ matrix.os }}
           asset_content_type: application/octet-stream
