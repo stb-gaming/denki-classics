@@ -97,7 +97,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
           tag_name: v${{ steps.package_version.outputs.version }}
-          release_name: ${{ github.ref != 'refs/heads/master' ? 'Pre-release' : 'Release' }} ${{ steps.package_version.outputs.version }}
+          release_name: |
+            ${{ github.ref != 'refs/heads/master' ? 'Pre-release' : 'Release' }} ${{ steps.package_version.outputs.version }}
           body: |
             ${{ github.ref != 'refs/heads/master' ? 'Pre-release' : 'Release' }} ${{ steps.package_version.outputs.version }}
           draft: false
