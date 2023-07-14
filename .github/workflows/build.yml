@@ -34,9 +34,17 @@ jobs:
       - name: Get Node.js version
         id: get_node_version
         run: |
-          node_version=$(cat .node-version 2>/dev/null || cat .nvmrc 2>/dev/null)
-          node_version="${node_version//v/}" # Remove 'v' prefix if present
+          if [ -f ".node-version" ]; then
+            node_version=$(cat .node-version | tr -d '\r\n')
+          elif [ -f ".nvmrc" ]; then
+            if [ "$RUNNER_OS" == "Windows" ]; then
+              node_version=$(Get-Content .nvmrc).Trim()
+            else
+              node_version=$(cat .nvmrc | tr -d '\r\n')
+            fi
+          fi
           echo "::set-output name=node_version::$node_version"
+
 
       - name: Setup Node.js
         uses: actions/setup-node@v2
