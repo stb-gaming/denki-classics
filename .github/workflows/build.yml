@@ -6,13 +6,10 @@ on:
       - master
       - develop
       - 'feature/design'
-  pull_request:
-    types:
-      - opened
-      - synchronize
-  release:
-    types:
-      - published
+#   pull_request:
+#     types:
+#       - opened
+#       - synchronize
 
 jobs:
   build:
@@ -52,7 +49,7 @@ jobs:
         run: echo "::set-output name=version::$(node -p "require('./package.json').version")"
 
       - name: Create release
-        if: ${{ github.ref == 'refs/heads/master' }}
+        if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/feature/design' }}
         id: create_release
         uses: actions/create-release@v1
         env:
@@ -63,40 +60,14 @@ jobs:
           body: |
             Release ${{ steps.package_version.outputs.version }}
           draft: false
-          prerelease: false
-
-      - name: Create pre-release
-        if: ${{ github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/feature/design' }}
-        id: create_prerelease
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        with:
-          tag_name: v${{ steps.package_version.outputs.version }}
-          release_name: Pre-release ${{ steps.package_version.outputs.version }}
-          body: |
-            Pre-release ${{ steps.package_version.outputs.version }}
-          draft: false
-          prerelease: true
+          prerelease: ${{ github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/feature/design' }}
 
       - name: Upload release asset
-        if: ${{ steps.create_release.outputs.release_id }}
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }}
-          asset_name: denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }}
-
-      - name: Upload pre-release asset
-        if: ${{ steps.create_prerelease.outputs.release_id }}
-        id: upload-prelease-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_prerelease.outputs.upload_url }}
           asset_path: ./dist/denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }}
           asset_name: denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }}
