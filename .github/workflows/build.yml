@@ -76,6 +76,13 @@ jobs:
           draft: false
           prerelease: true
 
+      - name: Package executables into artifacts
+        if: ${{ success() }}
+        run: |
+          mkdir artifacts
+          cp ./dist/denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }} artifacts/
+          ls -R artifacts
+
       - name: Upload release asset
         if: ${{ github.event_name == 'release' && steps.create_release.outputs.release_id }}
         id: upload-release-asset
