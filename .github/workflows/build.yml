@@ -58,7 +58,6 @@ jobs:
       - name: Get package info
         id: package_info
         run: echo "::set-output name=version::$(node -p "require('./package.json').version")"
-        run: echo "::set-output name=name::$(node -p "require('./package.json').name")"
 
       - name: Create release
         id: create_release
@@ -68,9 +67,9 @@ jobs:
         with:
           tag_name: v${{ steps.package_info.outputs.version }}
           release_name: |
-            ${{ steps.package_info.outputs.name }}} ${{ steps.package_info.outputs.version }}
+            ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/develop' && github.ref != 'refs/heads/feature/design' }}Pre-release ${{ steps.package_info.outputs.version }}
           body: |
-            ${{ steps.package_info.outputs.name }} ${{ steps.package_info.outputs.version }}
+            ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/develop' && github.ref != 'refs/heads/feature/design' }}Pre-release ${{ steps.package_info.outputs.version }} |
           draft: false
           prerelease: ${{ github.ref != 'refs/heads/master' }}
 
@@ -81,5 +80,3 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./dist/denki-classics-${{ steps.package_info.outputs.version }}_${{ matrix.os }}
-          asset_name: denki-classics-${{ steps.package_info.outputs.version }}_${{ matrix.os }}
-          asset_content_type: application/octet-stream
