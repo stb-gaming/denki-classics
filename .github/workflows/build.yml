@@ -64,7 +64,7 @@ jobs:
 
       - name: Create pre-release
         #if: startsWith(github.ref, 'refs/heads/develop')
-		if: startsWith(github.ref, 'refs/heads/develop') || startsWith(github.ref, 'refs/heads/feature/design/')
+        if: startsWith(github.ref, 'refs/heads/feature/interface')
         id: create_prerelease
         uses: actions/create-release@v1
         env:
