@@ -55,7 +55,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          tag_name: ${{ steps.package_version.outputs.version }}
+          tag_name: v${{ steps.package_version.outputs.version }}
           release_name: Release ${{ steps.package_version.outputs.version }}
           body: |
             Release ${{ steps.package_version.outputs.version }}
@@ -68,7 +68,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          tag_name: ${{ steps.package_version.outputs.version }}
+          tag_name: v${{ steps.package_version.outputs.version }}
           release_name: Pre-release ${{ steps.package_version.outputs.version }}
           body: |
             Pre-release ${{ steps.package_version.outputs.version }}
@@ -76,13 +76,25 @@ jobs:
           prerelease: true
 
       - name: Upload release asset
-        if: steps.create_release.outputs.release_id && matrix.os == 'windows-latest'
+        if: ${{ github.event_name == 'release' && steps.create_release.outputs.release_id }}
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }}
+          asset_name: denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }}
+          asset_content_type: application/octet-stream
+
+      - name: Upload pre-release asset
+        if: ${{ github.event_name == 'release' && steps.create_prerelease.outputs.release_id }}
+        id: upload-prelease-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_prerelease.outputs.upload_url }}
           asset_path: ./dist/denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }}
           asset_name: denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }}
           asset_content_type: application/octet-stream
