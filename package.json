@@ -1,6 +1,6 @@
 {
 	"name": "denki-classics",
-	"version": "0.0.1",
+	"version": "0.0.1-pre",
 	"description": "Beehive Bedlam, just Beehive Bedlam",
 	"main": "index.js",
 	"scripts": {
