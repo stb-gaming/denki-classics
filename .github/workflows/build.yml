@@ -15,12 +15,8 @@ on:
       - published
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
+  build-windows:
+    runs-on: windows-latest
 
     steps:
       - name: Checkout code
@@ -34,17 +30,49 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build Electron application
-        run: npm run build
+      - name: Build Windows
+        run: npm run buildWindows
+
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18.16.1
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Linux
+        run: npm run buildLinux
+
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18.16.1
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build macOS
+        run: npm run buildMac
 
   create-release:
-    needs: build
+    needs: [build-windows, build-linux, build-macos]
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/feature/design' }}
-
-    strategy:
-      matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
 
     steps:
       - name: Checkout code
@@ -79,4 +107,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/denki-classics-${{ steps.package_info.outputs.version }}_${{ matrix.os }}
+          asset_path: |
+            ./dist/denki-classics-${{ steps.package_info.outputs.version }}_windows-latest.exe,
+            ./dist/denki-classics-${{ steps.package_info.outputs.version }}_ubuntu-latest.AppImage,
+            ./dist/denki-classics-${{ steps.package_info.outputs.version }}_macos-latest.pkg
+          asset_name: |
+            denki-classics-${{ steps.package_info.outputs.version }}_windows-latest.exe,
+            denki-classics-${{ steps.package_info.outputs.version }}_ubuntu-latest.AppImage,
+            denki-classics-${{ steps.package_info.outputs.version }}_macos-latest.pkg
+          asset_content_type: application/octet-stream
