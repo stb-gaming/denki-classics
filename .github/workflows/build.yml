@@ -10,6 +10,9 @@ on:
     types:
       - opened
       - synchronize
+  release:
+    types:
+      - published
 
 jobs:
   build:
@@ -76,15 +79,8 @@ jobs:
           draft: false
           prerelease: true
 
-      - name: Package executables into artifacts
-        if: ${{ success() }}
-        run: |
-          mkdir artifacts
-          cp ./dist/denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }} artifacts/
-          ls -R artifacts
-
       - name: Upload release asset
-        if: ${{ github.event_name == 'release' && steps.create_release.outputs.release_id }}
+        if: ${{ github.event_name == 'release' && github.event.action == 'published' && steps.create_release.outputs.release_id }}
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
@@ -93,10 +89,9 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./dist/denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }}
           asset_name: denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }}
-          asset_content_type: application/octet-stream
 
       - name: Upload pre-release asset
-        if: ${{ github.event_name == 'release' && steps.create_prerelease.outputs.release_id }}
+        if: ${{ github.event_name == 'release' && github.event.action == 'published' && steps.create_prerelease.outputs.release_id }}
         id: upload-prelease-asset
         uses: actions/upload-release-asset@v1
         env:
@@ -105,4 +100,3 @@ jobs:
           upload_url: ${{ steps.create_prerelease.outputs.upload_url }}
           asset_path: ./dist/denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }}
           asset_name: denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }}
-          asset_content_type: application/octet-stream
