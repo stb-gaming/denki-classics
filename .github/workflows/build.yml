@@ -108,11 +108,11 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: |
-            ./dist/denki-classics-${{ steps.package_info.outputs.version }}_windows-latest.exe,
-            ./dist/denki-classics-${{ steps.package_info.outputs.version }}_ubuntu-latest.AppImage,
-            ./dist/denki-classics-${{ steps.package_info.outputs.version }}_macos-latest.pkg
+            ./dist/denki-classics-${{ steps.package_info.outputs.version }}.exe,
+            ./dist/denki-classics-${{ steps.package_info.outputs.version }}.AppImage,
+            ./dist/denki-classics-${{ steps.package_info.outputs.version }}.pkg
           asset_name: |
-            denki-classics-${{ steps.package_info.outputs.version }}_windows-latest.exe,
-            denki-classics-${{ steps.package_info.outputs.version }}_ubuntu-latest.AppImage,
-            denki-classics-${{ steps.package_info.outputs.version }}_macos-latest.pkg
+            denki-classics-${{ steps.package_info.outputs.version }}.exe,
+            denki-classics-${{ steps.package_info.outputs.version }}.AppImage,
+            denki-classics-${{ steps.package_info.outputs.version }}.pkg
           asset_content_type: application/octet-stream
