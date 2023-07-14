@@ -10,9 +10,6 @@ on:
     types:
       - opened
       - synchronize
-  release:
-    types:
-      - published
 
 jobs:
   build-windows:
@@ -107,12 +104,22 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
+
+
+# denki-classics-0.0.1-ia32-win.zip
+# denki-classics-0.0.1.tar.gz
           asset_path: |
-            ./dist/denki-classics-${{ steps.package_info.outputs.version }}.exe,
+            ./dist/denki-classics ${{ steps.package_info.outputs.version }}.exe,
             ./dist/denki-classics-${{ steps.package_info.outputs.version }}.AppImage,
             ./dist/denki-classics-${{ steps.package_info.outputs.version }}.pkg
+            ./dist/denki-classics-${{ steps.package_info.outputs.version }}-win.zip,
+            ./dist/denki-classics-${{ steps.package_info.outputs.version }}-ia32-win.zip,
+            ./dist/denki-classics-${{ steps.package_info.outputs.version }}.tar.gz
           asset_name: |
             denki-classics-${{ steps.package_info.outputs.version }}.exe,
             denki-classics-${{ steps.package_info.outputs.version }}.AppImage,
             denki-classics-${{ steps.package_info.outputs.version }}.pkg
+            denki-classics-${{ steps.package_info.outputs.version }}-win64.zip,
+            denki-classics-${{ steps.package_info.outputs.version }}-win32.zip,
+            denki-classics-${{ steps.package_info.outputs.version }}-linux.tar.gz
           asset_content_type: application/octet-stream
