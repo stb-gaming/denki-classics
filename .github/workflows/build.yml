@@ -1,11 +1,11 @@
-name: Build Electron Application
+name: Build and Release Electron Application
 
 on:
   push:
     branches:
       - master
       - develop
-      - feature/design
+      - 'feature/design'
   pull_request:
     types:
       - opened
@@ -33,11 +33,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 18.16.1
+          node-version: 14.16.1
 
       - name: Install dependencies
         run: npm ci
@@ -64,6 +63,7 @@ jobs:
           prerelease: false
 
       - name: Create pre-release
+        if: ${{ github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/feature/design' }}
         id: create_prerelease
         uses: actions/create-release@v1
         env:
