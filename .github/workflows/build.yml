@@ -175,4 +175,4 @@ jobs:
             - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}.tar.gz"
               file_name: "denki-classics-${{ steps.package_info.outputs.version }}-linux.tar.gz"
             - file_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}-mac.zip"
-              file_name: "denki-classics-${{ steps.package_info.outputs
+              file_name: "denki-classics-${{ steps.package_info.outputs"
