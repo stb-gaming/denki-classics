@@ -5,7 +5,7 @@ on:
     branches:
       - master
       - develop
-	  - feature/design
+      - feature/design
   pull_request:
     types:
       - opened
