@@ -103,12 +103,22 @@ jobs:
           draft: false
           prerelease: ${{ github.ref != 'refs/heads/master' }}
 
+  upload-assets:
+    needs: create-release
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'release' && github.event.action == 'published' }}
+
+    steps:
+      - name: Get package version
+        id: package_version
+        run: echo "::set-output name=version::$(node -p "require('./package.json').version")"
+
       - name: Upload Windows release asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
           asset_path: ./dist/denki-classics-${{ steps.package_version.outputs.version }}.exe
           asset_name: denki-classics-${{ steps.package_version.outputs.version }}.exe
           asset_content_type: application/octet-stream
@@ -118,7 +128,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
           asset_path: ./dist/denki-classics-${{ steps.package_version.outputs.version }}.AppImage
           asset_name: denki-classics-${{ steps.package_version.outputs.version }}.AppImage
           asset_content_type: application/octet-stream
@@ -128,7 +138,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
           asset_path: ./dist/denki-classics-${{ steps.package_version.outputs.version }}.pkg
           asset_name: denki-classics-${{ steps.package_version.outputs.version }}.pkg
           asset_content_type: application/octet-stream
