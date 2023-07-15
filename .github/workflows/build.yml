@@ -1,4 +1,4 @@
-name: Build Electron Application
+name: Build and Release Electron Application
 
 on:
   push:
@@ -9,92 +9,211 @@ on:
     types:
       - opened
       - synchronize
+env:
+  NODE_VERSION: 18.16.1
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
-        include:
-          - os: windows-latest
-            buildScript: buildWindows
-            releaseFileExtension: .exe
-          - os: ubuntu-latest
-            buildScript: buildLinux
-            releaseFileExtension: .AppImage
-          - os: macos-latest
-            buildScript: buildMac
-            releaseFileExtension: .pkg
+  build-windows:
+    runs-on: windows-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 18.16.1
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build Electron application
-        run: npm run ${{ matrix.buildScript }}
+      - name: Build Electron application for Windows
+        run: npm run buildWindows
 
-      - name: Get package version
-        id: package_version
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows-artifact
+          path: ./dist/denki-classics*
+
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Electron application for Linux
+        run: npm run buildLinux
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux-artifact
+          path: ./dist/denki-classics*
+
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Electron application for macOS
+        run: npm run buildMac
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: mac-artifact
+          path: ./dist/denki-classics*
+
+  create-release:
+    needs: [build-windows, build-linux, build-macos]
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/master'||github.ref == 'refs/heads/develop' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Download Windows artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: windows-artifact
+          path: ./dist
+
+      - name: Download Linux artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: linux-artifact
+          path: ./dist
+
+      - name: Download macOS artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: mac-artifact
+          path: ./dist
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+
+      - name: Check Package List
+        run: ls dist
+
+      - name: Get package info
+        id: package_info
         run: echo "::set-output name=version::$(node -p "require('./package.json').version")"
 
       - name: Create release
-        if: ${{ github.ref == 'refs/heads/master' }}
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          tag_name: v${{ steps.package_version.outputs.version }}
-          release_name: Release ${{ steps.package_version.outputs.version }}
+          tag_name: v${{ steps.package_info.outputs.version }}
+          release_name: Release ${{ steps.package_info.outputs.version }}
           body: |
-            Release ${{ steps.package_version.outputs.version }}
+            Release ${{ steps.package_info.outputs.version }}
           draft: false
-          prerelease: false
+          prerelease: ${{ github.ref != 'refs/heads/master' }}
 
-      - name: Create pre-release
-        id: create_prerelease
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        with:
-          tag_name: v${{ steps.package_version.outputs.version }}
-          release_name: Pre-release ${{ steps.package_version.outputs.version }}
-          body: |
-            Pre-release ${{ steps.package_version.outputs.version }}
-          draft: false
-          prerelease: true
-
-      - name: Upload release asset
-        if: ${{ github.event_name == 'release' && steps.create_release.outputs.release_id }}
-        id: upload-release-asset
+      - name: Upload Windows executable
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }}
-          asset_name: denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }}
+          asset_path: "./dist/denki-classics ${{ steps.package_info.outputs.version }}.exe"
+          asset_name: "denki-classics-${{ steps.package_info.outputs.version }}-windows.exe"
           asset_content_type: application/octet-stream
 
-      - name: Upload pre-release asset
-        if: ${{ github.event_name == 'release' && steps.create_prerelease.outputs.release_id }}
-        id: upload-prelease-asset
+      - name: Upload Linux AppImage
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          upload_url: ${{ steps.create_prerelease.outputs.upload_url }}
-          asset_path: ./dist/denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }}
-          asset_name: denki-classics-${{ steps.package_version.outputs.version }}${{ matrix.releaseFileExtension }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}.AppImage"
+          asset_name: "denki-classics-${{ steps.package_info.outputs.version }}-linux.AppImage"
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS pkg file
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}.pkg"
+          asset_name: "denki-classics-${{ steps.package_info.outputs.version }}-mac.pkg"
+          asset_content_type: application/octet-stream
+
+      - name: Upload Windows 64-bit archive
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}-win.zip"
+          asset_name: "denki-classics-${{ steps.package_info.outputs.version }}-win64.zip"
+          asset_content_type: application/octet-stream
+
+      - name: Upload Windows 32-bit archive
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}-ia32-win.zip"
+          asset_name: "denki-classics-${{ steps.package_info.outputs.version }}-win32.zip"
+          asset_content_type: application/octet-stream
+
+      - name: Upload Linux archive
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}.tar.gz"
+          asset_name: "denki-classics-${{ steps.package_info.outputs.version }}-linux.tar.gz"
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS archive
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}-mac.zip"
+          asset_name: "denki-classics-${{ steps.package_info.outputs.version }}-mac.zip"
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS archive blockmap
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: "./dist/denki-classics-${{ steps.package_info.outputs.version }}-mac.zip.blockmap"
+          asset_name: "denki-classics-${{ steps.package_info.outputs.version }}-mac.zip.blockmap"
           asset_content_type: application/octet-stream

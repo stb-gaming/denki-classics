@@ -1,6 +1,6 @@
 {
 	"name": "denki-classics",
-	"version": "0.0.1",
+	"version": "0.0.1-pre",
 	"description": "Beehive Bedlam, just Beehive Bedlam",
 	"main": "index.js",
 	"scripts": {
@@ -10,7 +10,7 @@
 		"build": "./build.bat",
 		"buildWindows": "electron-builder build --win portable zip --x64 --ia32 --publish never",
 		"buildLinux": "electron-builder build --linux AppImage tar.gz --publish never",
-		"buildMac": "electron-builder build --mac pkg --publish never"
+		"buildMac": "electron-builder build --mac pkg zip --publish never"
 	},
 	"repository": "git+https://github.com/stb-gaming/denki-classics.git",
 	"author": "tumble1999",
