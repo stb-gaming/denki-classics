@@ -27,41 +27,16 @@
 		
 				return selectedDir;
 			}
-		
-			/**
-			 * @param form {HTMLFormElement}
-			 */
-			function getFormData(form) {
-				let data = new FormData(form);
-				let obj = {};
-		
-				data.forEach((value, key) => { obj[key] = value; });
-				return obj;
-			}
-		
-			function setFormData(form, data) {
-				for (const child of Array.from(form.querySelectorAll("input select"))) {
-					child.value = data[child.name];
-				}
-			}
-		
-			function loadSettings(settings) {
+			
+			SkyGames.loadSettings().then(settings => {
 				const settingsDirEl = document.getElementById("settings-dir")
 				settingsDirEl.innerHTML = settings.gamesFolder;
-			}
-			
-			SkyGames.loadSettings().then(loadSettings);
+			});
 		
-		
-			/**
-			 * @param e {SubmitEvent}
-			 */
-			async function saveSettings(e) {
-				e.preventDefault();
-		
-				///TODO: get form fields
-				let settings = getFormData(e.target);
-		
+			async function saveSettings() {
+				let settings;
+				// get settings somehow
+
 				try {
 					await SkyGames.saveSettings(settings);
 		
@@ -75,8 +50,6 @@
 		
 				location.href = "index.html";
 			}
-		
-			form.addEventListener("submit", saveSettings)
-		</script>
+			</script>
 	</body>
 </html>
