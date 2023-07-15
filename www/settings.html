@@ -1,77 +1,82 @@
-<h2>Settings</h2>
-<div class="set-game-dir" style="white-space: nowrap">
-	<p>Select the folder where games are to be stored:</p>
-	<span id="settings-dir"></span>
-	<button onclick="openDirectory()">Choose</button>
-</div>
-
-<form id="settings"></form>
-<button onclick="saveSettings()">Save</button>
-
-<script>
-
-	async function openDirectory() {
-		const dialogRet = await SkyGames.openDirectoryDialog();
-		const selectedDir = dialogRet.filePaths[0];
-
-		const settingsDirEl = document.getElementById("settings-dir")
-
-		settingsDirEl.innerHTML = selectedDir;
-		settingsDirEl.style = "border-style: solid; border-spacing: 10px"
-
-		return selectedDir;
-	}
-
-	/**
-	 * @param form {HTMLFormElement}
-	 */
-	function getFormData(form) {
-		let data = new FormData(form);
-		let obj = {};
-
-		data.forEach((value, key) => { obj[key] = value; });
-		return obj;
-	}
-
-	function setFormData(form, data) {
-		for (const child of Array.from(form.querySelectorAll("input select"))) {
-			child.value = data[child.name];
-		}
-	}
-
-	function loadSettings(settings) {
-		// put stuff into form
-		const settingsDirEl = document.getElementById("settings-dir")
-
-		settingsDirEl.innerHTML = settings.gamesFolder;
-		settingsDirEl.style = "border-style: solid; border-spacing: 10px"
-	}
-	
-	SkyGames.loadSettings().then(loadSettings);
-
-
-	/**
-	 * @param e {SubmitEvent}
-	 */
-	async function saveSettings(e) {
-		e.preventDefault();
-
-		///TODO: get form fields
-		let settings = getFormData(e.target);
-
-		try {
-			await SkyGames.saveSettings(settings);
-
-		} catch (error) {
-			if (error) {
-				alert("There was an error, see console, for more info");
-				console.error(error);
-				return;
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Settings: Sky Games</title>
+		<link rel="stylesheet" href="styles/settings.css">
+	</head>
+	<body>
+		<h2>Settings</h2>
+		<div class="set-game-dir" style="white-space: nowrap">
+			<p>Select the folder where games are to be stored:</p>
+			<span id="settings-dir" style="border: 2px solid"></span>
+			<button onclick="openDirectory()">Choose</button>
+		</div>
+		
+		<form id="settings"></form>
+		<button onclick="saveSettings()">Save</button>
+		
+		<script>
+		
+			async function openDirectory() {
+				const dialogRet = await SkyGames.openDirectoryDialog();
+				const selectedDir = dialogRet.filePaths[0];
+		
+				const settingsDirEl = document.getElementById("settings-dir")
+		
+				settingsDirEl.innerHTML = selectedDir;
+		
+				return selectedDir;
 			}
-		}
-
-		location.href = "index.html";
-	}
-
-	form.addEventListener("submit", saveSettings)
-</script>
+		
+			/**
+			 * @param form {HTMLFormElement}
+			 */
+			function getFormData(form) {
+				let data = new FormData(form);
+				let obj = {};
+		
+				data.forEach((value, key) => { obj[key] = value; });
+				return obj;
+			}
+		
+			function setFormData(form, data) {
+				for (const child of Array.from(form.querySelectorAll("input select"))) {
+					child.value = data[child.name];
+				}
+			}
+		
+			function loadSettings(settings) {
+				const settingsDirEl = document.getElementById("settings-dir")
+				settingsDirEl.innerHTML = settings.gamesFolder;
+			}
+			
+			SkyGames.loadSettings().then(loadSettings);
+		
+		
+			/**
+			 * @param e {SubmitEvent}
+			 */
+			async function saveSettings(e) {
+				e.preventDefault();
+		
+				///TODO: get form fields
+				let settings = getFormData(e.target);
+		
+				try {
+					await SkyGames.saveSettings(settings);
+		
+				} catch (error) {
+					if (error) {
+						alert("There was an error, see console, for more info");
+						console.error(error);
+						return;
+					}
+				}
+		
+				location.href = "index.html";
+			}
+		
+			form.addEventListener("submit", saveSettings)
+		</script>
+	</body>
+</html>
