@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Settings: Sky Games</title>
+		<link rel="stylesheet" href="styles/settings.css">
+	</head>
+	<body>
+		<h2>Settings</h2>
+		<div class="set-game-dir" style="white-space: nowrap">
+			<p>Select the folder where games are to be stored:</p>
+			<span id="settings-dir" style="border: 2px solid"></span>
+			<button onclick="openDirectory()">Choose</button>
+		</div>
+		
+		<form id="settings"></form>
+		<button onclick="saveSettings()">Save</button>
+		
+		<script>
+		
+			async function openDirectory() {
+				const dialogRet = await SkyGames.openDirectoryDialog();
+				const selectedDir = dialogRet.filePaths[0];
+		
+				const settingsDirEl = document.getElementById("settings-dir")
+		
+				settingsDirEl.innerHTML = selectedDir;
+		
+				return selectedDir;
+			}
+			
+			SkyGames.loadSettings().then(settings => {
+				const settingsDirEl = document.getElementById("settings-dir")
+				settingsDirEl.innerHTML = settings.gamesFolder;
+			});
+		
+			async function saveSettings() {
+				let settings;
+				// get settings somehow
+
+				try {
+					await SkyGames.saveSettings(settings);
+		
+				} catch (error) {
+					if (error) {
+						alert("There was an error, see console, for more info");
+						console.error(error);
+						return;
+					}
+				}
+		
+				location.href = "index.html";
+			}
+			</script>
+	</body>
+</html>

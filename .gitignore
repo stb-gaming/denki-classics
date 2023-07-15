@@ -8,4 +8,5 @@ public
 *.code-workspace
 .bat
 .sh
+*.map
 dev-app-update.yml

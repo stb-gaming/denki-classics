@@ -5,5 +5,8 @@ contextBridge.exposeInMainWorld("SkyGames", {
 	saveSettings: (settings) => ipcRenderer.invoke('savesettings', settings),
 	loadSettings: () => ipcRenderer.invoke('loadsettings'),
 	installGame: (id) => ipcRenderer.invoke('installgame', id),
-	launchGame: (id) => ipcRenderer.invoke('launchgame', id)
+	launchGame: (id) => ipcRenderer.invoke('launchgame', id),
+	loadGames: () => ipcRenderer.invoke('loadgames'),
+	openDirectoryDialog: () => ipcRenderer.invoke('opendirectory'),
+	on: (event, func) => ipcRenderer.on(event, func)
 });

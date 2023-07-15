@@ -1,10 +1,10 @@
 const fs = require("fs/promises");
 
-const fileReadable = async (path) => {
+const fileReadable = async (filePath) => {
     try {
-        await fs.readFile(path);
-        return true
-    } catch (err) {
+        await fs.access(filePath, fs.constants.F_OK | fs.constants.R_OK)
+        return true;
+    } catch(err) {
         return false;
     }
 }

@@ -1,78 +1,104 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
-const { downloadFile, downloadGame } = require("./download");
+const { downloadFile } = require("./download");
 const { fileReadable } = require("./utils");
-const path = require('path');
-const fs = require('fs/promises');
 
-const createWindow = () => {
+const fs = require("fs/promises");
+const path = require('path');
+
+
+const createWindow = async () => {
 	const win = new BrowserWindow({
 		// frame: false,
-		width: 800,
-		height: 600,
+		width: 850,
+		height: 700,
 		webPreferences: {
 			preload: path.join(__dirname, "preload.js")
 		}
 	});
 
-	win.loadFile('../menu/index.html');
+	win.menuBarVisible = 0;
+	//win.maximize();
+
+	win.loadFile('www/index.html');
+
+	// win.webContents.openDevTools();
+
+	async function injectFile(file) {
+		let pathParts = file.split(".");
+
+		if (pathParts[pathParts.length - 1] == "css") {
+			await win.webContents.insertCSS((await fs.readFile(path.join(app.assetsPaths.css, file))).toString());
+		} else {
+			await win.webContents.executeJavaScript((await fs.readFile(path.join(app.assetsPaths[pathParts[pathParts.length - 2] == "user" ? "userscripts" : "js"], file))).toString());
+		}
+
+	}
+
+	await injectFile("base.css");
+	await injectFile("sky-games.css");
+
+
+	win.webContents.on("did-finish-load", async () => {
+		console.log("here", win.webContents.getURL());
+
+		await injectFile("sky-remote.user.js");
+		await injectFile("gamepad-support.user.js");
+		let url = win.webContents.getURL();
+		if (url.includes("app.asr") || url.includes("www/")) {
+			await injectFile("menu.js");
+			await injectFile("sky-games.js");
+
+		}
+
+	});
 
 	return win;
 };
 
-const getSettings = async () => {
-	const json = await fs.readFile(app.settingsPath);
-	return JSON.parse(json);
-}
+/*
 
-const ipcHandlers = {
-	'getFolder': () => app.userDataPath,
-	'savesettings': async (event, settings) => {
-		await fs.writeFile(app.settingsPath, JSON.stringify(settings, null, 2));
-	},
-	'loadsettings': async () => await getSettings(),
-	'launchgame': async (event, id) => {
-		const settings = await getSettings();
-		const gamePath = settings.gamesFolder;
-		const gameFiles = ["app.html", "app.js", "app.wasm", "app.data"]
+*/
 
-		let gameInstalled = true;
-
-		for (const file of gameFiles) {
-			if (!fileReadable(path.join(gamePath, id, file))) {
-				gameInstalled = false;
-				break;
-			}
-		}
-
-		if (!gameInstalled) {
-			return false;
-		} else {
-			app.mainWindow.loadFile(path.join(gamePath, id, "app.html"))
-			return true;
-		}
-	},
-	'installgame': async (event, id) => {
-		const settings = await getSettings();
-		const gamePath = settings.gamesFolder;
-		await downloadGame(id, gamePath)
-	}
-};
 
 app.whenReady().then(async () => {
-	app.userDataPath = app.getPath("userData")
-	app.settingsPath = path.join(app.userDataPath, "settings.json")
-	app.gamesYaml = path.join(app.userDataPath, "games.yml")
+	const assets = require("./assets");
 
-	try {
-		await fs.access(app.gamesYaml, fs.constants.R_OK)
-		console.log(`games.yml exists in ${app.userDataPath}: OK!`)
-	} catch (err) {
-		console.error(`games.yml doesn't exist in ${app.userDataPath}, downloading it now.`)
-		downloadFile("https://raw.githubusercontent.com/stb-gaming/sky-games/master/_data/games.yml", app.userDataPath);
+	app.userDataPath = app.getPath("userData");
+	app.assetsRoot = path.join(app.userDataPath, "Assets");
+	app.settingsPath = path.join(app.userDataPath, "settings.json");
+	app.gamesYaml = path.join(app.userDataPath, "games.yml");
+
+	app.assetsPaths = {
+		css: path.join(app.assetsRoot, "css"),
+		js: path.join(app.assetsRoot, "js"),
+		userscripts: path.join(app.assetsRoot, "userscripts"),
+	};
+
+	Object.entries(app.assetsPaths).forEach(async ([type, filePath]) => {
+		if (!await fileReadable(filePath)) {
+			await fs.mkdir(filePath, { recursive: true });
+		}
+		Object.values(assets[type]).forEach(async assetUrl => {
+			const urlParts = assetUrl.split("/")
+			const destPath = path.join(filePath, urlParts[urlParts.length - 1])
+			if (!await fileReadable(destPath)) {
+				await downloadFile(assetUrl, filePath);
+			}
+		});
+	});
+
+	if (!await fileReadable(app.settingsPath)) {
+		await fs.writeFile(app.settingsPath, JSON.stringify(require("./defaults"), null, 2));
+	}
+	if (await fileReadable(app.gamesYaml)) {
+		console.log(`games.yml exists in ${app.userDataPath}: OK!`);
+	} else {
+		console.error(`games.yml doesn't exist yet - downloading to ${app.gamesYaml}`);
+		await downloadFile("https://raw.githubusercontent.com/stb-gaming/sky-games/master/_data/games.yml", app.userDataPath);
 	}
 
-	Object.entries(ipcHandlers).forEach(([channel, func]) => {
-		ipcMain.handle(channel, func)
-	})
+	Object.entries(require("./handlers")).forEach(([channel, func]) => {
+		ipcMain.handle(channel, func);
+	});
 	app.mainWindow = createWindow();
 });

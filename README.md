@@ -1,0 +1,1 @@
+[![Build and Release Electron Application](https://github.com/stb-gaming/denki-classics/actions/workflows/build.yml/badge.svg)](https://github.com/stb-gaming/denki-classics/actions/workflows/build.yml)
